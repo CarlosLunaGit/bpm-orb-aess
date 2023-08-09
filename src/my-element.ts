@@ -1,96 +1,70 @@
-import { LitElement, css, html } from 'lit'
-import { customElement, property } from 'lit/decorators.js'
-import litLogo from './assets/lit.svg'
-import viteLogo from '/vite.svg'
+import { LitElement, css, html } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import { CanvasComponent } from './components/canvas/canvas';
 
 /**
- * An example element.
+ * Main container for the BPM SaaS app.
  *
- * @slot - This element has a slot
+ * @slot - This element has a slot for additional content
  * @csspart button - The button
  */
-@customElement('my-element')
-export class MyElement extends LitElement {
-  /**
-   * Copy for the read the docs hint.
-   */
-  @property()
-  docsHint = 'Click on the Vite and Lit logos to learn more'
+@customElement('bpm-app')
+export class BPMApp extends LitElement {
+
+  // Initialize the canvas component when the element is attached to the DOM
+  connectedCallback() {
+    super.connectedCallback();
+    this.canvasComponent = new CanvasComponent('processCanvas');
+  }
 
   /**
-   * The number of times the button has been clicked.
+   * Add a rectangle shape to the canvas.
    */
-  @property({ type: Number })
-  count = 0
+  addRectangleToCanvas() {
+    this.canvasComponent.addRectangle();
+  }
+
+  /**
+   * Add a circle shape to the canvas.
+   */
+  addCircleToCanvas() {
+    this.canvasComponent.addCircle();
+  }
 
   render() {
     return html`
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src=${viteLogo} class="logo" alt="Vite logo" />
-        </a>
-        <a href="https://lit.dev" target="_blank">
-          <img src=${litLogo} class="logo lit" alt="Lit logo" />
-        </a>
+      <div id="canvasContainer">
+        <canvas id="processCanvas"></canvas>
       </div>
+      <button @click=${this.addRectangleToCanvas}>Add Rectangle</button>
+      <button @click=${this.addCircleToCanvas}>Add Circle</button>
       <slot></slot>
-      <div class="card">
-        <button @click=${this._onClick} part="button">
-          count is ${this.count}
-        </button>
-      </div>
-      <p class="read-the-docs">${this.docsHint}</p>
-    `
-  }
-
-  private _onClick() {
-    this.count++
+    `;
   }
 
   static styles = css`
     :host {
+      display: block;
       max-width: 1280px;
       margin: 0 auto;
       padding: 2rem;
       text-align: center;
     }
 
-    .logo {
-      height: 6em;
-      padding: 1.5em;
-      will-change: filter;
-      transition: filter 300ms;
-    }
-    .logo:hover {
-      filter: drop-shadow(0 0 2em #646cffaa);
-    }
-    .logo.lit:hover {
-      filter: drop-shadow(0 0 2em #325cffaa);
+    #canvasContainer {
+      width: 800px;
+      height: 600px;
+      border: 1px solid #ccc;
+      margin: 20px auto;
     }
 
-    .card {
-      padding: 2em;
-    }
-
-    .read-the-docs {
-      color: #888;
-    }
-
-    ::slotted(h1) {
-      font-size: 3.2em;
-      line-height: 1.1;
-    }
-
-    a {
-      font-weight: 500;
-      color: #646cff;
-      text-decoration: inherit;
-    }
-    a:hover {
-      color: #535bf2;
+    #processCanvas {
+      width: 100%;
+      height: 100%;
     }
 
     button {
+      margin-top: 1rem;
       border-radius: 8px;
       border: 1px solid transparent;
       padding: 0.6em 1.2em;
@@ -98,30 +72,24 @@ export class MyElement extends LitElement {
       font-weight: 500;
       font-family: inherit;
       background-color: #1a1a1a;
+      color: #fff;
       cursor: pointer;
       transition: border-color 0.25s;
     }
+
     button:hover {
       border-color: #646cff;
     }
+
     button:focus,
     button:focus-visible {
       outline: 4px auto -webkit-focus-ring-color;
-    }
-
-    @media (prefers-color-scheme: light) {
-      a:hover {
-        color: #747bff;
-      }
-      button {
-        background-color: #f9f9f9;
-      }
     }
   `
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'my-element': MyElement
+    'bpm-app': BPMApp
   }
 }
