@@ -2,43 +2,47 @@ import { LitElement, css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { CanvasComponent } from './components/canvas/canvas';
 
-/**
- * Main container for the BPM SaaS app.
- *
- * @slot - This element has a slot for additional content
- * @csspart button - The button
- */
 @customElement('bpm-app')
 export class BPMApp extends LitElement {
+  private canvasComponent?: CanvasComponent;
 
-  // Initialize the canvas component when the element is attached to the DOM
+  constructor() {
+    super();
+  }
+
   connectedCallback() {
     super.connectedCallback();
-    this.canvasComponent = new CanvasComponent('processCanvas');
+    // Delay the initialization to ensure the DOM is fully rendered
+    setTimeout(() => {
+      const canvasEl = this.shadowRoot?.querySelector('#processCanvas');
+      if (canvasEl) {
+        this.canvasComponent = new CanvasComponent(canvasEl as HTMLCanvasElement);
+      }
+    }, 0);
   }
 
   /**
    * Add a rectangle shape to the canvas.
    */
   addRectangleToCanvas() {
-    this.canvasComponent.addRectangle();
+    this.canvasComponent?.addRectangle();
   }
 
   /**
    * Add a circle shape to the canvas.
    */
   addCircleToCanvas() {
-    this.canvasComponent.addCircle();
+    this.canvasComponent?.addCircle();
   }
 
   render() {
     return html`
       <div id="canvasContainer">
-        <canvas id="processCanvas"></canvas>
+        <canvas id="processCanvas" width="800" height="600"></canvas>
+
       </div>
       <button @click=${this.addRectangleToCanvas}>Add Rectangle</button>
       <button @click=${this.addCircleToCanvas}>Add Circle</button>
-      <slot></slot>
     `;
   }
 
@@ -56,11 +60,6 @@ export class BPMApp extends LitElement {
       height: 600px;
       border: 1px solid #ccc;
       margin: 20px auto;
-    }
-
-    #processCanvas {
-      width: 100%;
-      height: 100%;
     }
 
     button {
@@ -90,6 +89,6 @@ export class BPMApp extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'bpm-app': BPMApp
+    'bpm-app': BPMApp;
   }
 }
