@@ -1,6 +1,8 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { CanvasComponent } from './components/canvas/canvas';
+import { SidebarComponent } from './components/sidebar/sidebar';
+
 
 @customElement('bpm-app')
 export class BPMApp extends LitElement {
@@ -10,16 +12,17 @@ export class BPMApp extends LitElement {
     super();
   }
 
-  connectedCallback() {
+  async connectedCallback() {
     super.connectedCallback();
-    // Delay the initialization to ensure the DOM is fully rendered
-    setTimeout(() => {
-      const canvasEl = this.shadowRoot?.querySelector('#processCanvas');
-      if (canvasEl) {
+    await this.updateComplete; // Wait for the component to render
+
+    const canvasEl = this.shadowRoot?.querySelector('#processCanvas');
+    if (canvasEl) {
         this.canvasComponent = new CanvasComponent(canvasEl as HTMLCanvasElement);
-      }
-    }, 0);
-  }
+        new SidebarComponent(this.canvasComponent, this.shadowRoot);
+    }
+}
+
 
   /**
    * Add a rectangle shape to the canvas.
@@ -37,6 +40,12 @@ export class BPMApp extends LitElement {
 
   render() {
     return html`
+    <div id="sidebar">
+    <div id="task" draggable="true">Task</div>
+    <div id="event" draggable="true">Event</div>
+    <div id="gateway" draggable="true">Gateway</div>
+</div>
+
       <div id="canvasContainer">
         <canvas id="processCanvas" width="800" height="600"></canvas>
 

@@ -1,17 +1,15 @@
-// Assuming you have a SidebarComponent class
-
 export class SidebarComponent {
-    constructor(private canvasComponent: CanvasComponent) {
+    constructor(private canvasComponent: CanvasComponent, private shadowRoot: ShadowRoot | null) {
         // Bind the drag and drop events to the BPMN shapes in the sidebar
-        document.getElementById('task').addEventListener('dragend', () => {
+        this.shadowRoot?.querySelector('#task')?.addEventListener('dragend', () => {
             this.canvasComponent.addTask();
         });
 
-        document.getElementById('event').addEventListener('dragend', () => {
+        this.shadowRoot?.querySelector('#event')?.addEventListener('dragend', () => {
             this.canvasComponent.addEvent();
         });
 
-        document.getElementById('gateway').addEventListener('dragend', () => {
+        this.shadowRoot?.querySelector('#gateway')?.addEventListener('dragend', () => {
             this.canvasComponent.addGateway();
         });
     }
