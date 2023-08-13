@@ -1,8 +1,10 @@
 import { fabric } from 'fabric';
+import { PropertiesPanelComponent } from '../proprertiesPanel/propertiesPanel';
 
 export class CanvasComponent {
     private canvas: fabric.Canvas;
     private gridSize: number = 20; // Define the size of each grid square
+    private propertiesPanel: PropertiesPanelComponent;
 
     /**
      * Initializes a new instance of the CanvasComponent class.
@@ -18,7 +20,17 @@ export class CanvasComponent {
 
         this.canvas.renderAll();
         this.drawGrid();
-    this.enableSnapToGrid();
+        this.enableSnapToGrid();
+
+        this.propertiesPanel = new PropertiesPanelComponent('propertiesForm');
+        this.setupCanvasEventListeners();
+    }
+
+    private setupCanvasEventListeners(): void {
+        this.canvas.on('object:selected', (event) => {
+            // Pass the selected object to the properties panel
+            this.propertiesPanel.setSelectedElement(event.target);
+        });
     }
 
     /**
@@ -90,7 +102,7 @@ export class CanvasComponent {
         for (let i = 0; i < (options.height / options.distance); i++) {
             this.canvas.add(new fabric.Line([0, i * options.distance, options.width, i * options.distance], options.param));
         }
-    }
+    } 
 
     /**
      * Enables snap-to-grid functionality.
@@ -166,4 +178,27 @@ export class CanvasComponent {
             selectable: true
         });
     }
+
+    
+/**
+ * Zooms in the canvas.
+ */
+zoomIn(): void {
+    let zoom = this.canvas.getZoom();
+    zoom = zoom + 0.1;
+    this.canvas.setZoom(zoom);
+}
+
+/**
+ * Zooms out the canvas.
+ */
+zoomOut(): void {
+    let zoom = this.canvas.getZoom();
+    if (zoom > 0.1) {
+        zoom = zoom - 0.1;
+        this.canvas.setZoom(zoom);
+    }
+}
+
+
 }

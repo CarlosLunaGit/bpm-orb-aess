@@ -40,16 +40,17 @@ export class BPMApp extends LitElement {
 
   render() {
     return html`
-    <div id="sidebar">
-    <div id="task" draggable="true">Task</div>
-    <div id="event" draggable="true">Event</div>
-    <div id="gateway" draggable="true">Gateway</div>
-</div>
+      <div id="sidebar">
+        <div id="task" draggable="true">Task</div>
+        <div id="event" draggable="true">Event</div>
+        <div id="gateway" draggable="true">Gateway</div>
+      </div>
 
       <div id="canvasContainer">
         <canvas id="processCanvas" width="800" height="600"></canvas>
 
       </div>
+      <form id="propertiesForm"></form>
       <button @click=${this.addRectangleToCanvas}>Add Rectangle</button>
       <button @click=${this.addCircleToCanvas}>Add Circle</button>
     `;
