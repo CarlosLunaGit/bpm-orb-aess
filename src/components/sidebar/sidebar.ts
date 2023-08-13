@@ -12,5 +12,14 @@ export class SidebarComponent {
         this.shadowRoot?.querySelector('#gateway')?.addEventListener('dragend', () => {
             this.canvasComponent.addGateway();
         });
+
+        // Bind the undo and redo actions to the respective icons
+        this.shadowRoot?.querySelector('#undo-icon')?.addEventListener('click', () => {
+            this.canvasComponent.undo();
+        });
+
+        this.shadowRoot?.querySelector('#redo-icon')?.addEventListener('click', () => {
+            this.canvasComponent.redo();
+        });
     }
 }
