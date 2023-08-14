@@ -66,7 +66,8 @@ export class CanvasComponent {
     const rect = new fabric.Rect({
       left: 100,
       top: 100,
-      fill: "lightgray",
+      fill: "white",
+      stroke: "black",
       width: 120,
       height: 80,
       rx: 10, // Rounded corners
@@ -91,7 +92,6 @@ export class CanvasComponent {
       top: 250,
       fill: "white",
       stroke: "black",
-      strokeWidth: 2,
       radius: 30,
       type: "Event",
     });
@@ -113,7 +113,6 @@ export class CanvasComponent {
       top: 400,
       fill: "white",
       stroke: "black",
-      strokeWidth: 2,
       type: "Gateway",
     });
 

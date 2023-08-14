@@ -80,9 +80,15 @@ resizeCanvas(canvasEl: HTMLCanvasElement) {
   render() {
     return html`
     <div id="propertiesForm">
-    <form >
-        <label>Name: <input type="text" name="name" value=''></label>
-        <label>Description: <textarea name="description"></textarea></label>
+      <form id="propertiesFormElement">
+        <div class="form-floating">
+          <input type="text" name="name" value='' class="form-control" id="inputName">
+          <label class="__label" for="inputName">Name</label>
+        </div>
+        <div class="form-floating">
+          <textarea name="description" class="form-control" id="inputDescription"></textarea>
+          <label class="__label" for="inputDescription">Description</label>
+        </div>
       </form>
     </div>
       
@@ -141,10 +147,16 @@ resizeCanvas(canvasEl: HTMLCanvasElement) {
 
   #propertiesForm {
     grid-area: properties;
+
+  }
+
+  #propertiesFormElement{
     display: flex;
-    flex-direction: row;
+    flex-flow: wrap;
     gap: 1rem;
     width: max-content;
+    place-content: center;
+    align-items: center;  
   }
 
   #sidebar {
@@ -155,11 +167,74 @@ resizeCanvas(canvasEl: HTMLCanvasElement) {
     gap: 1rem;
   }
 
+  #sidebar > div {
+    cursor: pointer
+  }
+
   #canvasContainer {
     grid-area: canvas;
   }
 
+  .form-floating {
+      position: relative;
+      padding-top: 0.25rem;
+      padding-right: 0px;
+      padding-bottom: 0.25rem;
+      padding-left: 0px;
+      display: flex;
+     
+  }
 
+  .form-floating > .form-control,
+  .form-floating > .form-select {
+    height: 15px;
+    color: slategrey;
+    padding-top: 0.95rem;
+    padding-right: 0.75rem;
+    padding-bottom: 0.25rem;
+    padding-left: 0.75rem;
+      border-radius: .25rem;
+      background-color: var(--bs-input-bg, #fff);
+      border: 1px solid var(--bs-input-border-color, #ced4da);
+      transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+  }
+
+  .form-floating > label {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      padding-right: 0.75rem;
+    
+    padding-left: 0.75rem;
+      pointer-events: none;
+      border: 1px solid transparent;
+      transform-origin: 0 0;
+      transition: opacity .1s ease-in-out, transform .1s ease-in-out;
+      transform: translate(0, 1.5rem) scale(.75);
+  }
+
+
+
+  .form-floating > .form-control:focus ~ label,
+  .form-floating > .form-control:not(:placeholder-shown) ~ label,
+  .form-floating > .form-select:focus ~ label {
+      opacity: .65;
+      transform: translate(0, .5rem) scale(.75);
+  }
+
+  
+  .__label {
+    font-family: "Volvo Novum";
+    font-weight: 400;
+    font-style: normal;
+    font-size: 12px;
+    color: #575757;
+    text-align: left;
+    line-height: 12px;
+  }
+
+  
 
 
     #sidebar div {
@@ -175,9 +250,9 @@ resizeCanvas(canvasEl: HTMLCanvasElement) {
     }
 
     button {
-      margin-top: 1rem;
+     
       border-radius: 8px;
-      border: 1px solid transparent;
+      border: 1px solid #656565;
       padding: 0.6em 1.2em;
       font-size: 1em;
       font-weight: 500;
