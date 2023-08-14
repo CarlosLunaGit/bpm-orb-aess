@@ -29,8 +29,7 @@ export class PropertiesPanelComponent {
         let formContent = '';
         if (this.selectedElement.type === 'Task') {
             formContent = `
-            <div id="propertiesForm">
-                <form id="propertiesFormElement">
+          
                     <div class="form-floating">
                     <input type="text" name="name" value="${this.selectedElement.name || ''}" class="form-control" id="inputName">
                     <label class="__label" for="inputName">Name</label>
@@ -45,8 +44,7 @@ export class PropertiesPanelComponent {
         } 
         else if (this.selectedElement.type === 'Event') {
             formContent = `
-            <div id="propertiesForm">
-                <form id="propertiesFormElement">
+            
                     <div class="form-floating">
                     <input type="text" name="name" value="${this.selectedElement.name || ''}" class="form-control" id="inputName">
                     <label class="__label" for="inputName">Name</label>
@@ -61,8 +59,7 @@ export class PropertiesPanelComponent {
         }
         else if (this.selectedElement.type === 'Gateway') {
             formContent = `
-            <div id="propertiesForm">
-                <form id="propertiesFormElement">
+            
                     <div class="form-floating">
                     <input type="text" name="name" value="${this.selectedElement.name || ''}" class="form-control" id="inputName">
                     <label class="__label" for="inputName">Name</label>
@@ -77,7 +74,7 @@ export class PropertiesPanelComponent {
         }
         // ... handle other BPMN element types
 
-        formContent += '<button type="submit">Update</button></form></div>';
+        formContent += '<button type="submit">Update</button>';
         this.propertiesForm.innerHTML = formContent;
     }
 

@@ -41,7 +41,7 @@ export class BPMApp extends LitElement {
     const canvasEl = this.shadowRoot?.querySelector('#processCanvas');
     if (canvasEl) {
         this.canvasComponent = new CanvasComponent(canvasEl as HTMLCanvasElement, null); // Temporarily pass null
-        const propertiesPanel = new PropertiesPanelComponent(this.canvasComponent, this.shadowRoot, 'propertiesForm');
+        const propertiesPanel = new PropertiesPanelComponent(this.canvasComponent, this.shadowRoot, 'propertiesFormElement');
         this.canvasComponent.propertiesPanel = propertiesPanel; // Assign the propertiesPanel to canvasComponent
         new SidebarComponent(this.canvasComponent, this.shadowRoot);
 
@@ -52,7 +52,15 @@ export class BPMApp extends LitElement {
         window.addEventListener('resize', () => {
             this.resizeCanvas(canvasEl as HTMLCanvasElement);
         });
+        const undoIconEl = this.shadowRoot?.querySelector('#undoIconId'); // Replace with the actual ID or selector
+        const redoIconEl = this.shadowRoot?.querySelector('#redoIconId'); // Replace with the actual ID or selector
+
+        undoIconEl?.addEventListener('click', () => this.canvasComponent?.undo());
+        redoIconEl?.addEventListener('click', () => this.canvasComponent?.redo());
+        
     }
+
+    
 }
 
 resizeCanvas(canvasEl: HTMLCanvasElement) {
@@ -60,22 +68,9 @@ resizeCanvas(canvasEl: HTMLCanvasElement) {
     const containerHeight = canvasEl.parentElement?.clientHeight || 600; // Default to 600 if not found
 
     this.canvasComponent?.canvas.setDimensions({ width: containerWidth, height: containerHeight });
+    
 }
 
-
-  /**
-   * Add a rectangle shape to the canvas.
-   */
-  addRectangleToCanvas() {
-    this.canvasComponent?.addRectangle();
-  }
-
-  /**
-   * Add a circle shape to the canvas.
-   */
-  addCircleToCanvas() {
-    this.canvasComponent?.addCircle();
-  }
 
   render() {
     return html`
@@ -115,9 +110,10 @@ resizeCanvas(canvasEl: HTMLCanvasElement) {
         ></div>
 
         <!-- Toolbar Icons -->
-        <div .innerHTML=${undoIcon} title="Undo"></div>
-        <div .innerHTML=${redoIcon} title="Redo"></div>
+        <div id="undoIconId" .innerHTML=${undoIcon} title="Undo"></div>
+        <div id="redoIconId" .innerHTML=${redoIcon} title="Redo"></div>
         <!-- Add other icons for different actions here -->
+        
       </div>
 
       <div id="canvasContainer">
