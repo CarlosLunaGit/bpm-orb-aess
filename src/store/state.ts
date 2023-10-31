@@ -1,4 +1,8 @@
 export interface CanvasState {
     elements: any[];
-    otherFields: any;  // Add more properties as needed
+    otherFields: {
+      // Define properties here
+      versionHistory: any[];
+      // Add more properties as needed
+    };
   }

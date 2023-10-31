@@ -1,11 +1,10 @@
 import { fabric } from "fabric";
-import { addTask, addEvent, addGateway } from './bpmnElements';
-import { addDataObject, addDataStore } from './bpmnDataElements';
+import { addTask, addEvent, addGateway } from "./bpmnElements";
+import { addDataObject, addDataStore } from "./bpmnDataElements";
 
 import { PropertiesPanelComponent } from "../proprertiesPanel/propertiesPanel";
 import "fabric-history";
 import { CanvasState } from "../../store/state";
-
 
 export class CanvasComponent {
   public canvas: fabric.Canvas;
@@ -89,23 +88,23 @@ export class CanvasComponent {
     let newElement;
 
     switch (elementType) {
-      case 'Task':
+      case "Task":
         newElement = addTask();
         break;
-      case 'Event':
+      case "Event":
         newElement = addEvent();
         break;
-      case 'Gateway':
+      case "Gateway":
         newElement = addGateway();
         break;
-      case 'DataObject':
+      case "DataObject":
         newElement = addDataObject();
         break;
-      case 'DataStore':
+      case "DataStore":
         newElement = addDataStore();
         break;
       default:
-        console.error('Invalid element type');
+        console.error("Invalid element type");
         return;
     }
 
@@ -232,32 +231,36 @@ export class CanvasComponent {
     });
   }
 
-  undo(): void {
-    const lastAction = this.undoStack.pop();
-    if (lastAction?.action === "addElement") {
-      this.canvas.remove(lastAction.element);
-      this.setState({
-        elements: this.state.elements.filter((el) => el !== lastAction.element),
-      });
-      this.redoStack.push(lastAction);
-    } else {
-      // Handle other redo actions
-      // Update this.state.otherFields accordingly
+  // Helper method to handle undo/redo actions
+  private handleAction(
+    action: string,
+    sourceStack: any[],
+    targetStack: any[]
+  ): void {
+    const lastAction = sourceStack.pop();
+    if (lastAction) {
+      if (lastAction.action === "addElement") {
+        this.canvas[action === "undo" ? "remove" : "add"](lastAction.element);
+        this.setState({
+          elements:
+            action === "undo"
+              ? this.state.elements.filter((el) => el !== lastAction.element)
+              : [...this.state.elements, lastAction.element],
+        });
+      } else {
+        // Handle other actions
+        // Update this.state.otherFields accordingly
+      }
+      targetStack.push(lastAction);
     }
-    // Handle other undo actions
+  }
+
+  undo(): void {
+    this.handleAction("undo", this.undoStack, this.redoStack);
   }
 
   redo(): void {
-    const lastAction = this.redoStack.pop();
-    if (lastAction?.action === "addElement") {
-      this.canvas.add(lastAction.element);
-      this.setState({ elements: [...this.state.elements, lastAction.element] });
-      this.undoStack.push(lastAction);
-    } else {
-      // Handle other redo actions
-      // Update this.state.otherFields accordingly
-    }
-    // Handle other redo actions
+    this.handleAction("redo", this.redoStack, this.undoStack);
   }
 
   // Helper method to update state
@@ -337,15 +340,44 @@ export class CanvasComponent {
     }
   }
 
-/**
- * Updates the element on the canvas.
- * @param {fabric.Object} element - The element to update.
- */
-public updateElement(element: fabric.Object): void {
-  const activeObject = this.canvas.getActiveObject();
-  if (activeObject && activeObject.type === element.type) {
-    activeObject.set(element);
-    this.canvas.renderAll();
+  /**
+   * Updates the element on the canvas.
+   * @param {fabric.Object} element - The element to update.
+   */
+  public updateElement(element: fabric.Object): void {
+    const activeObject = this.canvas.getActiveObject();
+    if (activeObject && activeObject.type === element.type) {
+      activeObject.set(element);
+      this.canvas.renderAll();
+    }
   }
-}
+
+  // Method to move an element
+  moveElement(element: fabric.Object, newPosition: { x: number; y: number }) {
+    element.set({ left: newPosition.x, top: newPosition.y });
+    this.canvas.renderAll();
+    this.updateState();
+  }
+
+  // Method to resize an element
+  resizeElement(
+    element: fabric.Object,
+    newSize: { width: number; height: number }
+  ) {
+    element.set({ width: newSize.width, height: newSize.height });
+    this.canvas.renderAll();
+    this.updateState();
+  }
+
+  // Method to delete an element
+  deleteElement(element: fabric.Object) {
+    this.canvas.remove(element);
+    this.updateState();
+  }
+
+  // Method to update CanvasState
+  updateState() {
+    this.state.elements = this.canvas.getObjects();
+    // Update otherFields as needed
+  }
 }
