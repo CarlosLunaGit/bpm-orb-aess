@@ -20,63 +20,35 @@ export class PropertiesPanelComponent {
         this.displayPropertiesForm();
     }
 
-    /**
-     * Display the properties form based on the selected BPMN element.
-     */
-    private displayPropertiesForm(): void {
-        if (!this.selectedElement) return;
+/**
+ * Generate form content based on the selected BPMN element type.
+ * @param {string} elementType - The type of the BPMN element.
+ * @returns {string} - The form content.
+ */
+private generateFormContent(elementType: string): string {
+    return `
+        <div class="form-floating">
+            <input type="text" name="name" value="${this.selectedElement.name || ''}" class="form-control" id="inputName">
+            <label class="__label" for="inputName">Name</label>
+        </div>
+        <div class="form-floating">
+            <textarea name="description" class="form-control" id="inputDescription">${this.selectedElement.description || ''}</textarea>
+            <label class="__label" for="inputDescription">Description</label>
+        </div>
+    `;
+}
 
-        let formContent = '';
-        if (this.selectedElement.type === 'Task') {
-            formContent = `
-          
-                    <div class="form-floating">
-                    <input type="text" name="name" value="${this.selectedElement.name || ''}" class="form-control" id="inputName">
-                    <label class="__label" for="inputName">Name</label>
-                    </div>
-                    <div class="form-floating">
-                    <textarea name="description" class="form-control" id="inputDescription">${this.selectedElement.description || ''}</textarea>
-                    <label class="__label" for="inputDescription">Description</label>
-                    </div>
-                
-            
-            `;
-        } 
-        else if (this.selectedElement.type === 'Event') {
-            formContent = `
-            
-                    <div class="form-floating">
-                    <input type="text" name="name" value="${this.selectedElement.name || ''}" class="form-control" id="inputName">
-                    <label class="__label" for="inputName">Name</label>
-                    </div>
-                    <div class="form-floating">
-                    <textarea name="description" class="form-control" id="inputDescription">${this.selectedElement.description || ''}</textarea>
-                    <label class="__label" for="inputDescription">Description</label>
-                    </div>
-               
-            
-            `;
-        }
-        else if (this.selectedElement.type === 'Gateway') {
-            formContent = `
-            
-                    <div class="form-floating">
-                    <input type="text" name="name" value="${this.selectedElement.name || ''}" class="form-control" id="inputName">
-                    <label class="__label" for="inputName">Name</label>
-                    </div>
-                    <div class="form-floating">
-                    <textarea name="description" class="form-control" id="inputDescription">${this.selectedElement.description || ''}</textarea>
-                    <label class="__label" for="inputDescription">Description</label>
-                    </div>
-                
-            
-            `;
-        }
-        // ... handle other BPMN element types
+/**
+ * Display the properties form based on the selected BPMN element.
+ */
+private displayPropertiesForm(): void {
+    if (!this.selectedElement) return;
 
-        formContent += '<button type="submit">Update</button>';
-        this.propertiesForm.innerHTML = formContent;
-    }
+    let formContent = this.generateFormContent(this.selectedElement.type);
+    formContent += '<button type="submit">Update</button>';
+    this.propertiesForm.innerHTML = formContent;
+}
+
 
     /**
      * Setup event listeners for the form.

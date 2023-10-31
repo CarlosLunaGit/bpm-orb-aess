@@ -210,6 +210,8 @@ export class CanvasComponent {
       // Handle object selection
       this.enableObjectControls(event.target);
       this.propertiesPanel?.setSelectedElement(event.target);
+      // Add this line to populate the properties panel
+      this.propertiesPanel?.populateProperties(event.target);
     });
 
     // Listen for the 'delete' key to remove the selected object
