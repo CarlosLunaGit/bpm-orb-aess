@@ -82,44 +82,35 @@ export class CanvasComponent {
   }
 
   /**
-   * Adds a BPMN Task shape to the canvas.
+   * Generic method to add a BPMN element to the canvas.
+   * @param {string} elementType - The type of BPMN element to add.
    */
-  addTask(): void {
-    const newTask = addTask();  // This method is imported from bpmnElements.ts
-    this.postAddShape(newTask);
+  addElement(elementType: string): void {
+    let newElement;
+
+    switch (elementType) {
+      case 'Task':
+        newElement = addTask();
+        break;
+      case 'Event':
+        newElement = addEvent();
+        break;
+      case 'Gateway':
+        newElement = addGateway();
+        break;
+      case 'DataObject':
+        newElement = addDataObject();
+        break;
+      case 'DataStore':
+        newElement = addDataStore();
+        break;
+      default:
+        console.error('Invalid element type');
+        return;
+    }
+
+    this.postAddShape(newElement);
   }
-
-  /**
-   * Adds a BPMN Event shape to the canvas.
-   */
-  addEvent(): void {
-    const newEvent = addEvent();  // This method is imported from bpmnElements.ts
-    this.postAddShape(newEvent);
-  }
-
-  /**
-   * Adds a BPMN Gateway shape to the canvas.
-   */
-  addGateway(): void {
-    const newGateway = addGateway();  // This method is imported from bpmnElements.ts
-    this.postAddShape(newGateway);
-  }
-
-  /**
- * Adds a BPMN Data Object shape to the canvas.
- */
-addDataObject(): void {
-  const newDataObject = addDataObject();  // This method is imported from bpmnElements.ts
-  this.postAddShape(newDataObject);
-}
-
-/**
- * Adds a BPMN Data Store shape to the canvas.
- */
-addDataStore(): void {
-  const newDataStore = addDataStore();  // This method is imported from bpmnElements.ts
-  this.postAddShape(newDataStore);
-}
 
   /**
    * Common logic to execute after adding a shape.
