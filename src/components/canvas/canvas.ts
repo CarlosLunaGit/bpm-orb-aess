@@ -1,88 +1,85 @@
 import { fabric } from "fabric";
 import { PropertiesPanelComponent } from "../proprertiesPanel/propertiesPanel";
-import 'fabric-history';
+import "fabric-history";
+import { CanvasState } from "../../store/state";
 
 fabric.Task = fabric.util.createClass(fabric.Rect, {
-    type: 'Task',
-  
-    initialize: function(options) {
-      options = options || {};
-      this.callSuper('initialize', options);
-    },
-  
-    toObject: function() {
-      return fabric.util.object.extend(this.callSuper('toObject'), {
-        // any additional properties you want to include when converting to JSON
-      });
-    },
-  
-    _render: function(ctx) {
-      this.callSuper('_render', ctx);
-    }
-  });
-  
-  fabric.Task.fromObject = function(object, callback) {
-    return fabric.Object._fromObject('Task', object, callback);
-  };
+  type: "Task",
 
-  fabric.Gateway = fabric.util.createClass(fabric.Path, {
-    type: 'Gateway',
-  
-    initialize: function(pathData, options) {
-      options = options || {};
-      this.callSuper('initialize', pathData, options);
-    },
-  
-    toObject: function() {
-      return fabric.util.object.extend(this.callSuper('toObject'), {
-        // any additional properties you want to include when converting to JSON
-      });
-    },
-  
-    _render: function(ctx) {
-      this.callSuper('_render', ctx);
-    }
+  initialize: function (options) {
+    options = options || {};
+    this.callSuper("initialize", options);
+  },
+
+  toObject: function () {
+    return fabric.util.object.extend(this.callSuper("toObject"), {
+      // any additional properties you want to include when converting to JSON
+    });
+  },
+
+  _render: function (ctx) {
+    this.callSuper("_render", ctx);
+  },
 });
 
-fabric.Gateway.fromObject = function(object, callback) {
-    return fabric.Object._fromObject('Gateway', object, callback);
+fabric.Task.fromObject = function (object, callback) {
+  return fabric.Object._fromObject("Task", object, callback);
 };
 
+fabric.Gateway = fabric.util.createClass(fabric.Path, {
+  type: "Gateway",
 
-  fabric.Event = fabric.util.createClass(fabric.Circle, {
-    Event: 'Event',
-  
-    initialize: function(options) {
-      options = options || {};
-      this.callSuper('initialize', options);
-    },
-  
-    toObject: function() {
-      return fabric.util.object.extend(this.callSuper('toObject'), {
-        // any additional properties you want to include when converting to JSON
-      });
-    },
-  
-    _render: function(ctx) {
-      this.callSuper('_render', ctx);
-    }
-  });
-  
-  fabric.Event.fromObject = function(object, callback) {
-    return fabric.Object._fromObject('Event', object, callback);
-  };
-  
+  initialize: function (pathData, options) {
+    options = options || {};
+    this.callSuper("initialize", pathData, options);
+  },
 
+  toObject: function () {
+    return fabric.util.object.extend(this.callSuper("toObject"), {
+      // any additional properties you want to include when converting to JSON
+    });
+  },
+
+  _render: function (ctx) {
+    this.callSuper("_render", ctx);
+  },
+});
+
+fabric.Gateway.fromObject = function (object, callback) {
+  return fabric.Object._fromObject("Gateway", object, callback);
+};
+
+fabric.Event = fabric.util.createClass(fabric.Circle, {
+  Event: "Event",
+
+  initialize: function (options) {
+    options = options || {};
+    this.callSuper("initialize", options);
+  },
+
+  toObject: function () {
+    return fabric.util.object.extend(this.callSuper("toObject"), {
+      // any additional properties you want to include when converting to JSON
+    });
+  },
+
+  _render: function (ctx) {
+    this.callSuper("_render", ctx);
+  },
+});
+
+fabric.Event.fromObject = function (object, callback) {
+  return fabric.Object._fromObject("Event", object, callback);
+};
 
 export class CanvasComponent {
   public canvas: fabric.Canvas;
   private gridSize: number = 20; // Define the size of each grid square
   public propertiesPanel?: PropertiesPanelComponent;
+  public state: CanvasState;
+  private undoStack: any[] = [];
+  private redoStack: any[] = [];
 
-//   public state: string[] = [];
-//   public mods: number = 0;
-
-//   private isUndoRedoOperation: boolean = false;
   /**
    * Initializes a new instance of the CanvasComponent class.
    * @param {string} canvasId - The ID of the HTML canvas element.
@@ -91,6 +88,12 @@ export class CanvasComponent {
     this.propertiesPanel = propertiesPanel;
 
     this.canvas = new fabric.Canvas(canvasId);
+    this.state = {
+      elements: [],
+      otherFields: {},
+      // Initialize other state properties
+    };
+
     this.setCanvasSize();
     this.canvas.setBackgroundColor(
       "white",
@@ -98,14 +101,11 @@ export class CanvasComponent {
     );
 
     this.canvas.renderAll();
-    
 
     // Listen to window resize events
     window.addEventListener("resize", this.setCanvasSize.bind(this));
 
-    
     this.setGridBackground();
-    
 
     // this.canvas.renderAll()
     this.enableSnapToGrid();
@@ -150,32 +150,33 @@ export class CanvasComponent {
    * Adds a BPMN Task shape to the canvas.
    */
   addTask(): void {
-
-    const task = new fabric.Task({
-        left: 100,
+    const fotask = new fabric.Task({
+      left: 100,
       top: 100,
       fill: "white",
       stroke: "black",
       width: 120,
       height: 80,
-      rx: 10, // Rounded corners
+      rx: 10,
       ry: 10,
       type: "Task",
-      });
+    });
 
-    task.on("selected", (event) => {
-      console.log("Object selected task triggered");
+    fotask.on("selected", (event) => {
       this.propertiesPanel?.setSelectedElement(event.target);
     });
 
-    this.canvas.add(task);
+    this.canvas.add(fotask);
+    this.setState({ elements: [...this.state.elements, fotask] });
+    this.undoStack.push({ action: "addElement", element: fotask });
+    this.redoStack = [];
   }
 
   /**
    * Adds a BPMN Event shape to the canvas.
    */
   addEvent(): void {
-    const Event = new fabric.Event({
+    const foevent = new fabric.Event({
       left: 250,
       top: 250,
       fill: "white",
@@ -183,20 +184,22 @@ export class CanvasComponent {
       radius: 30,
       type: "Event",
     });
-  
-    Event.on("selected", (event) => {
-      console.log("Object selected Event triggered");
+
+    foevent.on("selected", (event) => {
       this.propertiesPanel?.setSelectedElement(event.target);
     });
 
-    this.canvas.add(Event);
+    this.canvas.add(foevent);
+    this.setState({ elements: [...this.state.elements, foevent] });
+    this.undoStack.push({ action: "addElement", element: foevent });
+    this.redoStack = [];
   }
 
   /**
- * Adds a BPMN Gateway shape to the canvas.
- */
-addGateway(): void {
-    const Gateway = new fabric.Gateway("M 0 30 L 30 60 L 60 30 L 30 0 z", {
+   * Adds a BPMN Gateway shape to the canvas.
+   */
+  addGateway(): void {
+    const fogateway = new fabric.Gateway("M 0 30 L 30 60 L 60 30 L 30 0 z", {
       left: 400,
       top: 400,
       fill: "white",
@@ -204,54 +207,58 @@ addGateway(): void {
       type: "Gateway",
     });
 
-    Gateway.on("selected", (event) => {
-      console.log("Object selected Gateway triggered");
+    fogateway.on("selected", (event) => {
       this.propertiesPanel?.setSelectedElement(event.target);
     });
 
-    this.canvas.add(Gateway);
-}
+    this.canvas.add(fogateway);
+    this.setState({ elements: [...this.state.elements, fogateway] });
+    this.undoStack.push({ action: "addElement", element: fogateway });
+    this.redoStack = [];
+  }
 
-
-/**
- * Sets a repeating grid background image for the canvas.
- */
-public setGridBackground(): void {
+  /**
+   * Sets a repeating grid background image for the canvas.
+   */
+  public setGridBackground(): void {
     if (this.canvas.width === 0 || this.canvas.height === 0) {
-        console.warn("Canvas dimensions are zero. Grid background not set.");
-        return;
+      console.warn("Canvas dimensions are zero. Grid background not set.");
+      return;
     }
     const gridSize = this.gridSize;
-    const gridCanvas = document.createElement('canvas');
+    const gridCanvas = document.createElement("canvas");
     gridCanvas.width = this.canvas.width;
     gridCanvas.height = this.canvas.height;
-    const ctx = gridCanvas.getContext('2d');
+    const ctx = gridCanvas.getContext("2d");
     if (ctx) {
-        ctx.strokeStyle = '#ebebeb';
-        ctx.lineWidth = 1;
-        for (let i = 0; i < this.canvas.width; i += gridSize) {
-          ctx.moveTo(i, 0);
-          ctx.lineTo(i, this.canvas.height);
-        }
-        for (let j = 0; j < this.canvas.height; j += gridSize) {
-          ctx.moveTo(0, j);
-          ctx.lineTo(this.canvas.width, j);
-        }
-        ctx.stroke();
+      ctx.strokeStyle = "#ebebeb";
+      ctx.lineWidth = 1;
+      for (let i = 0; i < this.canvas.width; i += gridSize) {
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, this.canvas.height);
       }
-      
+      for (let j = 0; j < this.canvas.height; j += gridSize) {
+        ctx.moveTo(0, j);
+        ctx.lineTo(this.canvas.width, j);
+      }
+      ctx.stroke();
+    }
+
     const gridImg = new Image();
     gridImg.src = gridCanvas.toDataURL();
 
     gridImg.onload = () => {
-      this.canvas.setBackgroundImage(gridImg.src, this.canvas.renderAll.bind(this.canvas), {
-        width: this.canvas.width,  // Set to gridSize
-        height: this.canvas.height, // Set to gridSize
-        repeat: 'repeat',
-      });
+      this.canvas.setBackgroundImage(
+        gridImg.src,
+        this.canvas.renderAll.bind(this.canvas),
+        {
+          width: this.canvas.width, // Set to gridSize
+          height: this.canvas.height, // Set to gridSize
+          repeat: "repeat",
+        }
+      );
     };
-}
-
+  }
 
   /**
    * Enables snap-to-grid functionality.
@@ -265,7 +272,6 @@ public setGridBackground(): void {
     });
   }
 
- 
   /**
    * Adds event listeners to the canvas for handling object interactions.
    * @private
@@ -278,15 +284,15 @@ public setGridBackground(): void {
 
     // Updated event listeners for undo/redo
     this.canvas.on("object:added", () => {
-    //   this.saveState();
+      //   this.saveState();
     });
 
     this.canvas.on("object:removed", () => {
-    //   this.saveState();
+      //   this.saveState();
     });
 
     this.canvas.on("object:modified", () => {
-    //   this.saveState();
+      //   this.saveState();
     });
 
     this.canvas.on("object:selected", (event) => {
@@ -304,64 +310,81 @@ public setGridBackground(): void {
       }
 
       if (e.keyCode === 90) {
-        this.canvas.undo()
+        this.canvas.undo();
       }
-  
+
       // Check pressed button is Y - Ctrl+Y.
       if (e.keyCode === 89) {
-          this.canvas.redo()
+        this.canvas.redo();
       }
     });
   }
 
-//   saveState(): void {
-//     let myjson = JSON.stringify(this.canvas);
-//     this.state.push(myjson);
-// }
+  undo(): void {
+    const lastAction = this.undoStack.pop();
+    if (lastAction?.action === "addElement") {
+      this.canvas.remove(lastAction.element);
+      this.setState({
+        elements: this.state.elements.filter((el) => el !== lastAction.element),
+      });
+      this.redoStack.push(lastAction);
+    } else {
+      // Handle other redo actions
+      // Update this.state.otherFields accordingly
+    }
+    // Handle other undo actions
+  }
 
+  redo(): void {
+    const lastAction = this.redoStack.pop();
+    if (lastAction?.action === "addElement") {
+      this.canvas.add(lastAction.element);
+      this.setState({ elements: [...this.state.elements, lastAction.element] });
+      this.undoStack.push(lastAction);
+    } else {
+      // Handle other redo actions
+      // Update this.state.otherFields accordingly
+    }
+    // Handle other redo actions
+  }
 
-// undo(): void {
-//     this.canvas.off('object:added', this.saveState);
-//     this.canvas.off('object:modified', this.saveState);
-//     if (this.mods < this.state.length) {
-//         this.canvas.clear().renderAll();
-//         this.canvas.loadFromJSON(this.state[this.state.length - 1 - this.mods - 1], () => {
-//             this.canvas.renderAll();
-//         });
-//         this.canvas.on('object:added', this.saveState);
-//         this.canvas.on('object:modified', this.saveState);
-//         console.log("state " + this.state.length);
-//         this.mods += 1;
-//         console.log("mods " + this.mods);
-//     }
-// }
+  // Helper method to update state
+  setState(newState: Partial<CanvasState>) {
+    this.state = { ...this.state, ...newState };
+  }
 
-// redo(): void {
-//     this.canvas.off('object:added', this.saveState);
-//     this.canvas.off('object:modified', this.saveState);
-//     if (this.mods > 0) {
-//         this.canvas.clear().renderAll();
-//         this.canvas.loadFromJSON(this.state[this.state.length - 1 - this.mods + 1], () => {
-//             this.canvas.renderAll();
-//         });
-//         this.canvas.on('object:added', this.saveState);
-//         this.canvas.on('object:modified', this.saveState);
-//         this.mods -= 1;
-//         console.log("state " + this.state.length);
-//         console.log("mods " + this.mods);
-//     }
-// }
+  /**
+   * Saves the current state of the canvas to localStorage.
+   */
+  saveCanvasState() {
+    try {
+      const canvasJSON = this.canvas.toJSON();
+      localStorage.setItem("canvasState", JSON.stringify(canvasJSON));
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
 
-undo(): void {
-    this.canvas.undo();
-    this.setGridBackground();
-}
-
-redo(): void {
-    this.canvas.redo();
-    this.setGridBackground();
-}
-
+  /**
+   * Loads the saved state of the canvas from localStorage.
+   */
+  loadCanvasState() {
+    try {
+      const savedCanvas = localStorage.getItem("canvasState");
+      if (savedCanvas) {
+        this.canvas.loadFromJSON(
+          JSON.parse(savedCanvas),
+          this.canvas.renderAll.bind(this.canvas)
+        );
+      } else {
+        console.warn("No saved canvas state found in localStorage.");
+      }
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
 
   /**
    * Enable controls for resizing, rotating, and other interactions.
@@ -406,6 +429,4 @@ redo(): void {
     // Logic to update the element on the canvas
     this.canvas.renderAll();
   }
-
-
 }

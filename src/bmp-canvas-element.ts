@@ -3,6 +3,8 @@ import { customElement, property } from "lit/decorators.js";
 import { CanvasComponent } from "./components/canvas/canvas";
 import { SidebarComponent } from "./components/sidebar/sidebar";
 import { PropertiesPanelComponent } from "./components/proprertiesPanel/propertiesPanel";
+import { CanvasOperations } from './components/canvas/canvasOperations';
+import { EventHandlers } from './events/eventHandlers';
 
 import { library, dom, icon } from "@fortawesome/fontawesome-svg-core";
 import {
@@ -14,6 +16,8 @@ import {
   faDotCircle,
   faBell,
   faCodeBranch,
+  faDownload,
+  faUpload
 } from "@fortawesome/free-solid-svg-icons";
 
 // Add icons to the library for convenience
@@ -22,6 +26,8 @@ dom.watch();
 
 const undoIcon = icon(faUndo).html;
 const redoIcon = icon(faRedo).html;
+const saveIcon = icon(faDownload).html;
+const loadIcon = icon(faUpload).html;
 const taskIcon = icon(faRectangleList).html;
 const eventIcon = icon(faDotCircle).html;
 const gatewayIcon = icon(faDiamond).html;
@@ -29,6 +35,8 @@ const gatewayIcon = icon(faDiamond).html;
 @customElement("bpm-app")
 export class BPMApp extends LitElement {
   private canvasComponent?: CanvasComponent;
+  private canvasOperations: CanvasOperations;
+  private eventHandlers: EventHandlers;
 
   constructor() {
     super();
@@ -43,46 +51,43 @@ export class BPMApp extends LitElement {
         this.canvasComponent = new CanvasComponent(canvasEl as HTMLCanvasElement, null); // Temporarily pass null
         const propertiesPanel = new PropertiesPanelComponent(this.canvasComponent, this.shadowRoot, 'propertiesFormElement');
         this.canvasComponent.propertiesPanel = propertiesPanel; // Assign the propertiesPanel to canvasComponent
+
         new SidebarComponent(this.canvasComponent, this.shadowRoot);
 
-        // Set initial canvas dimensions
-        this.resizeCanvas(canvasEl as HTMLCanvasElement);
+        this.canvasOperations = new CanvasOperations(this.canvasComponent);
+        this.canvasOperations.initializeCanvas(canvasEl as HTMLCanvasElement);
 
-        // Listen to window resize events
-        window.addEventListener('resize', () => {
-            this.resizeCanvas(canvasEl as HTMLCanvasElement);
-        });
-        const undoIconEl = this.shadowRoot?.querySelector('#undoIconId'); // Replace with the actual ID or selector
-        const redoIconEl = this.shadowRoot?.querySelector('#redoIconId'); // Replace with the actual ID or selector
-
-        undoIconEl?.addEventListener('click', () => this.canvasComponent?.undo());
-        redoIconEl?.addEventListener('click', () => this.canvasComponent?.redo());
+        this.eventHandlers = new EventHandlers(this.canvasComponent, this.shadowRoot);
+        this.eventHandlers.attachEventHandlers();
         
     }
 
     
 }
 
-resizeCanvas(canvasEl: HTMLCanvasElement) {
-    const containerWidth = canvasEl.parentElement?.clientWidth || 800; // Default to 800 if not found
-    const containerHeight = canvasEl.parentElement?.clientHeight || 600; // Default to 600 if not found
 
-    this.canvasComponent?.canvas.setDimensions({ width: containerWidth, height: containerHeight });
-    
-}
 
 
   render() {
     return html`
     <div id="propertiesForm">
-      <form id="propertiesFormElement">
-        <div class="form-floating">
+      <form id="propertiesFormElement" class='editor'>
+      Editor
+        <div class="form-floating editor-item">
+          <textarea name="bpmnType" class="form-control" id="bpmnType"></textarea>
+          <label class="__label" for="bpmnType">BPMN Type</label>
+        </div>
+        <div class="form-floating editor-item">
           <input type="text" name="name" value='' class="form-control" id="inputName">
           <label class="__label" for="inputName">Name</label>
         </div>
-        <div class="form-floating">
+        <div class="form-floating editor-item">
           <textarea name="description" class="form-control" id="inputDescription"></textarea>
           <label class="__label" for="inputDescription">Description</label>
+        </div>
+        <div class="form-floating editor-item">
+          <textarea name="Integration" class="form-control" id="inputIntegration"></textarea>
+          <label class="__label" for="inputIntegration">Integration</label>
         </div>
       </form>
     </div>
@@ -112,6 +117,8 @@ resizeCanvas(canvasEl: HTMLCanvasElement) {
         <!-- Toolbar Icons -->
         <div id="undoIconId" .innerHTML=${undoIcon} title="Undo"></div>
         <div id="redoIconId" .innerHTML=${redoIcon} title="Redo"></div>
+        <div id="saveIconId" .innerHTML=${saveIcon} title="Save/Download"></div>
+        <div id="loadIconId" .innerHTML=${loadIcon} title="Load/Open"></div>
         <!-- Add other icons for different actions here -->
         
       </div>
@@ -153,6 +160,7 @@ resizeCanvas(canvasEl: HTMLCanvasElement) {
     width: max-content;
     place-content: center;
     align-items: center;  
+    font-family: monospace;
   }
 
   #sidebar {
@@ -198,7 +206,6 @@ resizeCanvas(canvasEl: HTMLCanvasElement) {
   .form-floating > label {
       position: absolute;
       top: 0;
-      left: 0;
       height: 100%;
       padding-right: 0.75rem;
     
@@ -267,6 +274,13 @@ resizeCanvas(canvasEl: HTMLCanvasElement) {
     button:focus-visible {
       outline: 4px auto -webkit-focus-ring-color;
     }
+
+    .editor .editor-item:first-child  {
+      border-left: 1px solid #646464;
+      margin-left: .7vw !important;
+      padding-left: .7vw !important;
+    }
+    
   `;
 }
 
