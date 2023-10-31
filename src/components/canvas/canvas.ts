@@ -1,76 +1,11 @@
 import { fabric } from "fabric";
+import { addTask, addEvent, addGateway } from './bpmnElements';
+import { addDataObject, addDataStore } from './bpmnDataElements';
+
 import { PropertiesPanelComponent } from "../proprertiesPanel/propertiesPanel";
 import "fabric-history";
 import { CanvasState } from "../../store/state";
 
-fabric.Task = fabric.util.createClass(fabric.Rect, {
-  type: "Task",
-
-  initialize: function (options) {
-    options = options || {};
-    this.callSuper("initialize", options);
-  },
-
-  toObject: function () {
-    return fabric.util.object.extend(this.callSuper("toObject"), {
-      // any additional properties you want to include when converting to JSON
-    });
-  },
-
-  _render: function (ctx) {
-    this.callSuper("_render", ctx);
-  },
-});
-
-fabric.Task.fromObject = function (object, callback) {
-  return fabric.Object._fromObject("Task", object, callback);
-};
-
-fabric.Gateway = fabric.util.createClass(fabric.Path, {
-  type: "Gateway",
-
-  initialize: function (pathData, options) {
-    options = options || {};
-    this.callSuper("initialize", pathData, options);
-  },
-
-  toObject: function () {
-    return fabric.util.object.extend(this.callSuper("toObject"), {
-      // any additional properties you want to include when converting to JSON
-    });
-  },
-
-  _render: function (ctx) {
-    this.callSuper("_render", ctx);
-  },
-});
-
-fabric.Gateway.fromObject = function (object, callback) {
-  return fabric.Object._fromObject("Gateway", object, callback);
-};
-
-fabric.Event = fabric.util.createClass(fabric.Circle, {
-  Event: "Event",
-
-  initialize: function (options) {
-    options = options || {};
-    this.callSuper("initialize", options);
-  },
-
-  toObject: function () {
-    return fabric.util.object.extend(this.callSuper("toObject"), {
-      // any additional properties you want to include when converting to JSON
-    });
-  },
-
-  _render: function (ctx) {
-    this.callSuper("_render", ctx);
-  },
-});
-
-fabric.Event.fromObject = function (object, callback) {
-  return fabric.Object._fromObject("Event", object, callback);
-};
 
 export class CanvasComponent {
   public canvas: fabric.Canvas;
@@ -150,70 +85,54 @@ export class CanvasComponent {
    * Adds a BPMN Task shape to the canvas.
    */
   addTask(): void {
-    const fotask = new fabric.Task({
-      left: 100,
-      top: 100,
-      fill: "white",
-      stroke: "black",
-      width: 120,
-      height: 80,
-      rx: 10,
-      ry: 10,
-      type: "Task",
-    });
-
-    fotask.on("selected", (event) => {
-      this.propertiesPanel?.setSelectedElement(event.target);
-    });
-
-    this.canvas.add(fotask);
-    this.setState({ elements: [...this.state.elements, fotask] });
-    this.undoStack.push({ action: "addElement", element: fotask });
-    this.redoStack = [];
+    const newTask = addTask();  // This method is imported from bpmnElements.ts
+    this.postAddShape(newTask);
   }
 
   /**
    * Adds a BPMN Event shape to the canvas.
    */
   addEvent(): void {
-    const foevent = new fabric.Event({
-      left: 250,
-      top: 250,
-      fill: "white",
-      stroke: "black",
-      radius: 30,
-      type: "Event",
-    });
-
-    foevent.on("selected", (event) => {
-      this.propertiesPanel?.setSelectedElement(event.target);
-    });
-
-    this.canvas.add(foevent);
-    this.setState({ elements: [...this.state.elements, foevent] });
-    this.undoStack.push({ action: "addElement", element: foevent });
-    this.redoStack = [];
+    const newEvent = addEvent();  // This method is imported from bpmnElements.ts
+    this.postAddShape(newEvent);
   }
 
   /**
    * Adds a BPMN Gateway shape to the canvas.
    */
   addGateway(): void {
-    const fogateway = new fabric.Gateway("M 0 30 L 30 60 L 60 30 L 30 0 z", {
-      left: 400,
-      top: 400,
-      fill: "white",
-      stroke: "black",
-      type: "Gateway",
-    });
+    const newGateway = addGateway();  // This method is imported from bpmnElements.ts
+    this.postAddShape(newGateway);
+  }
 
-    fogateway.on("selected", (event) => {
+  /**
+ * Adds a BPMN Data Object shape to the canvas.
+ */
+addDataObject(): void {
+  const newDataObject = addDataObject();  // This method is imported from bpmnElements.ts
+  this.postAddShape(newDataObject);
+}
+
+/**
+ * Adds a BPMN Data Store shape to the canvas.
+ */
+addDataStore(): void {
+  const newDataStore = addDataStore();  // This method is imported from bpmnElements.ts
+  this.postAddShape(newDataStore);
+}
+
+  /**
+   * Common logic to execute after adding a shape.
+   * @param {fabric.Object} shape - The newly added shape.
+   */
+  private postAddShape(shape: fabric.Object): void {
+    shape.on("selected", (event) => {
       this.propertiesPanel?.setSelectedElement(event.target);
     });
 
-    this.canvas.add(fogateway);
-    this.setState({ elements: [...this.state.elements, fogateway] });
-    this.undoStack.push({ action: "addElement", element: fogateway });
+    this.canvas.add(shape);
+    this.setState({ elements: [...this.state.elements, shape] });
+    this.undoStack.push({ action: "addElement", element: shape });
     this.redoStack = [];
   }
 
@@ -425,8 +344,15 @@ export class CanvasComponent {
     }
   }
 
-  public updateElement(element: any): void {
-    // Logic to update the element on the canvas
+/**
+ * Updates the element on the canvas.
+ * @param {fabric.Object} element - The element to update.
+ */
+public updateElement(element: fabric.Object): void {
+  const activeObject = this.canvas.getActiveObject();
+  if (activeObject && activeObject.type === element.type) {
+    activeObject.set(element);
     this.canvas.renderAll();
   }
+}
 }
