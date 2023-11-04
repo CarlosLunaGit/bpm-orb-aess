@@ -1,15 +1,18 @@
 // src/components/canvas/canvasEventHandlers.ts
 
 import { fabric } from "fabric";
+import { CanvasStateManager, CanvasAction } from '../../store/state';
 
 /**
  * Handles canvas-specific events and updates the state accordingly.
  */
 export class CanvasEventHandlers {
   private canvas: fabric.Canvas;
+  private stateManager: CanvasStateManager;
 
-  constructor(canvas: fabric.Canvas) {
+  constructor(canvas: fabric.Canvas, stateManager: CanvasStateManager) {
     this.canvas = canvas;
+    this.stateManager = stateManager;
     this.initialize();
   }
 
@@ -58,12 +61,15 @@ export class CanvasEventHandlers {
   private handleObjectMoved(event: fabric.IEvent): void {
     // Handle object moved event
     const object = event.target;
-    this.updateState({
-      type: "move",
-      object: object,
-      from: { left: object.originalState.left, top: object.originalState.top },
-      to: { left: object.left, top: object.top },
-    });
+    if (object) {
+      const action: CanvasAction = {
+        type: 'move',
+        object: object,
+        from: { left: object.originalState.left, top: object.originalState.top },
+        to: { left: object.left, top: object.top },
+      };
+      this.stateManager.updateState(action);
+    }
   }
 
   private handleContextMenu(x: number, y: number): string {

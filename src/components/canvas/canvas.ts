@@ -1,6 +1,7 @@
 import { fabric } from "fabric";
 import { addTask, addEvent, addGateway } from "./bpmnElements";
 import { addDataObject, addDataStore } from "./bpmnDataElements";
+import { CanvasStateManager, CanvasState } from './store/state';
 import { CanvasEventHandlers } from './canvasEventHandlers';
 import { PropertiesPanelComponent } from "../proprertiesPanel/propertiesPanel";
 import "fabric-history";
