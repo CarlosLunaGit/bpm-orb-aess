@@ -13,7 +13,6 @@ export class CanvasEventHandlers {
   constructor(canvas: fabric.Canvas, stateManager: CanvasStateManager) {
     this.canvas = canvas;
     this.stateManager = stateManager;
-    this.initialize();
   }
 
   private initialize(): void {

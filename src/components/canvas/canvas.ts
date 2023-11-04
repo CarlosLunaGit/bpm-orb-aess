@@ -1,17 +1,23 @@
 import { fabric } from "fabric";
 import { addTask, addEvent, addGateway } from "./bpmnElements";
 import { addDataObject, addDataStore } from "./bpmnDataElements";
-import { CanvasStateManager, CanvasState } from './store/state';
-import { CanvasEventHandlers } from './canvasEventHandlers';
+import {
+  CanvasState,
+  CanvasStateManager,
+  CanvasAction,
+} from "../../store/state";
+
+import { CanvasEventHandlers } from "./canvasEventHandlers";
 import { PropertiesPanelComponent } from "../proprertiesPanel/propertiesPanel";
 import "fabric-history";
-import { CanvasState } from "../../store/state";
 
 export class CanvasComponent {
   public canvas: fabric.Canvas;
   private gridSize: number = 20; // Define the size of each grid square
+  public stateManager: CanvasStateManager;
   public propertiesPanel?: PropertiesPanelComponent;
   public canvasEventHandlers: CanvasEventHandlers;
+  
   public state: CanvasState;
   private undoStack: any[] = [];
   private redoStack: any[] = [];
@@ -20,14 +26,21 @@ export class CanvasComponent {
    * Initializes a new instance of the CanvasComponent class.
    * @param {string} canvasId - The ID of the HTML canvas element.
    */
-  constructor(canvasId: string, propertiesPanel: PropertiesPanelComponent) {
+  constructor(
+    canvasId: string,
+    propertiesPanel: PropertiesPanelComponent,
+    stateManager: CanvasStateManager,
+    canvasEventHandlers: CanvasEventHandlers
+  ) {
     this.propertiesPanel = propertiesPanel;
 
     this.canvas = new fabric.Canvas(canvasId);
     this.state = {
       elements: [],
-      otherFields: {},
-      // Initialize other state properties
+      otherFields: {
+        versionHistory: [],
+        // Initialize other fields as needed
+      },
     };
 
     this.setCanvasSize();
@@ -49,7 +62,9 @@ export class CanvasComponent {
     // Call the addEventListeners method here
     this.addEventListeners();
 
-    this.canvasEventHandlers = new CanvasEventHandlers(this.canvas);
+    this.stateManager = stateManager;
+    this.canvasEventHandlers = canvasEventHandlers;
+    
   }
 
   private setCanvasSize(): void {
@@ -124,7 +139,7 @@ export class CanvasComponent {
     this.canvas.add(shape);
     this.undoStack.push({ action: "addElement", element: shape });
     this.redoStack = [];
-    this.updateState();
+    this.handleStateUpdate('add', shape);
   }
 
   /**
@@ -187,7 +202,6 @@ export class CanvasComponent {
    * @private
    */
   private addEventListeners(): void {
-
     // Listen for the 'delete' key to remove the selected object
     document.addEventListener("keydown", (e) => {
       if (e.key === "Delete" && this.canvas.getActiveObject()) {
@@ -204,7 +218,6 @@ export class CanvasComponent {
         this.canvas.redo();
       }
     });
-
   }
 
   // Helper method to handle undo/redo actions
@@ -332,7 +345,7 @@ export class CanvasComponent {
   moveElement(element: fabric.Object, newPosition: { x: number; y: number }) {
     element.set({ left: newPosition.x, top: newPosition.y });
     this.canvas.renderAll();
-    this.updateState();
+    this.handleStateUpdate('move', element);
   }
 
   // Method to resize an element
@@ -342,18 +355,22 @@ export class CanvasComponent {
   ) {
     element.set({ width: newSize.width, height: newSize.height });
     this.canvas.renderAll();
-    this.updateState();
+    this.handleStateUpdate('resize', element);
   }
 
   // Method to delete an element
   deleteElement(element: fabric.Object) {
     this.canvas.remove(element);
-    this.updateState();
+    this.handleStateUpdate('delete', element);
   }
 
   // Method to update CanvasState
-  updateState() {
-    const elements = this.canvas.getObjects();
-    this.setState({ elements: elements });
+  private handleStateUpdate(actionType: string, element: fabric.Object): void {
+    const action: CanvasAction = {
+      type: actionType,
+      object: element,
+      // Include 'from' and 'to' if necessary for the action type
+    };
+    this.stateManager.updateState(action);
   }
 }

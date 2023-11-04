@@ -4,7 +4,7 @@ import { CanvasComponent } from '../canvas/canvas'; // Adjust the path according
 export class PropertiesPanelComponent {
     private selectedElement: any; // This will store the currently selected BPMN element
     private propertiesForm: HTMLFormElement; // This will represent the form element in the DOM
-    private canvasComponent: CanvasComponent; // Add this line
+    public canvasComponent: CanvasComponent; // Add this line
 
     constructor(canvasComponent: CanvasComponent, private shadowRoot: ShadowRoot | null, formId: string) {
         this.canvasComponent = canvasComponent;
