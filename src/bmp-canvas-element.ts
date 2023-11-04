@@ -61,11 +61,11 @@ export class BPMApp extends LitElement {
       const stateManager = new CanvasStateManager(initialState);
     
       // Initialize propertiesPanel and canvasEventHandlers
-      const propertiesPanel = new PropertiesPanelComponent(
-        null, // Temporarily pass null
-        this.shadowRoot,
-        "propertiesFormElement"
-      );
+      // const propertiesPanel = new PropertiesPanelComponent(
+      //   null, // Temporarily pass null
+      //   this.shadowRoot,
+      //   "propertiesFormElement"
+      // );
 
       const canvasEventHandlers = new CanvasEventHandlers(
         null,
@@ -75,15 +75,24 @@ export class BPMApp extends LitElement {
       // Pass the required arguments to the canvas component
       this.canvasComponent = new CanvasComponent(
         canvasEl.id, // Assuming canvasEl.id is the ID of the canvas element
-        propertiesPanel,
+        // propertiesPanel,
         stateManager,
         canvasEventHandlers
       );
 
-      propertiesPanel.canvasComponent = this.canvasComponent ; // Assign the propertiesPanel to canvasComponent
+      // Initialize propertiesPanel without canvasComponent
+      const propertiesPanel = new PropertiesPanelComponent(
+        this.shadowRoot,
+        "propertiesFormElement"
+      );
+
+      propertiesPanel.bindToCanvas(this.canvasComponent);
+
+      this.canvasComponent.setPropertiesPanel(propertiesPanel);
+
       canvasEventHandlers.canvas = this.canvasComponent ; // Assign the propertiesPanel to canvasComponent
       canvasEventHandlers.initialize();
-      
+
       new SidebarComponent(this.canvasComponent, this.shadowRoot);
 
       this.canvasOperations = new CanvasOperations(this.canvasComponent);

@@ -15,7 +15,7 @@ export class CanvasComponent {
   public canvas: fabric.Canvas;
   private gridSize: number = 20; // Define the size of each grid square
   public stateManager: CanvasStateManager;
-  public propertiesPanel?: PropertiesPanelComponent;
+  // public propertiesPanel?: PropertiesPanelComponent;
   public canvasEventHandlers: CanvasEventHandlers;
   
   public state: CanvasState;
@@ -28,11 +28,11 @@ export class CanvasComponent {
    */
   constructor(
     canvasId: string,
-    propertiesPanel: PropertiesPanelComponent,
+    // propertiesPanel: PropertiesPanelComponent,
     stateManager: CanvasStateManager,
-    canvasEventHandlers: CanvasEventHandlers
+    // canvasEventHandlers: CanvasEventHandlers
   ) {
-    this.propertiesPanel = propertiesPanel;
+    // this.propertiesPanel = propertiesPanel;
 
     this.canvas = new fabric.Canvas(canvasId);
     this.state = {
@@ -63,8 +63,22 @@ export class CanvasComponent {
     this.addEventListeners();
 
     this.stateManager = stateManager;
-    this.canvasEventHandlers = canvasEventHandlers;
+    // this.canvasEventHandlers = canvasEventHandlers;
     
+  }
+
+  public setPropertiesPanel(propertiesPanel: PropertiesPanelComponent) {
+    this.propertiesPanel = propertiesPanel;
+  }
+
+  public setEventHandlers(canvasEventHandlers: CanvasEventHandlers) {
+    this.canvasEventHandlers = canvasEventHandlers;
+  }
+
+  private handleElementSelected(element: fabric.Object) {
+    // Emit an event or call a callback function here
+    // For example:
+    this.onElementSelected?.(element);
   }
 
   private setCanvasSize(): void {
@@ -126,6 +140,8 @@ export class CanvasComponent {
 
     this.postAddShape(newElement);
   }
+
+
 
   /**
    * Common logic to execute after adding a shape.

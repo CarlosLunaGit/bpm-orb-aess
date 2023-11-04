@@ -1,18 +1,20 @@
 // src/components/canvas/canvasEventHandlers.ts
 
-import { fabric } from "fabric";
+// import { fabric } from "fabric";
 import { CanvasStateManager, CanvasAction } from '../../store/state';
 
 /**
  * Handles canvas-specific events and updates the state accordingly.
  */
 export class CanvasEventHandlers {
-  private canvas: fabric.Canvas;
   private stateManager: CanvasStateManager;
 
-  constructor(canvas: fabric.Canvas, stateManager: CanvasStateManager) {
-    this.canvas = canvas;
+  constructor(stateManager: CanvasStateManager) {
     this.stateManager = stateManager;
+  }
+
+  public bindToCanvas(canvasComponent: CanvasComponent) {
+    canvasComponent.onEventActive = this.setSelectedElement.bind(this);
   }
 
   private initialize(): void {
