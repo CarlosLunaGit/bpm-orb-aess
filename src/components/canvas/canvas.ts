@@ -28,9 +28,7 @@ export class CanvasComponent {
    */
   constructor(
     canvasId: string,
-    // propertiesPanel: PropertiesPanelComponent,
     stateManager: CanvasStateManager,
-    // canvasEventHandlers: CanvasEventHandlers
   ) {
     // this.propertiesPanel = propertiesPanel;
 
@@ -56,7 +54,6 @@ export class CanvasComponent {
 
     this.setGridBackground();
 
-    // this.canvas.renderAll()
     this.enableSnapToGrid();
 
     // Call the addEventListeners method here
@@ -69,10 +66,6 @@ export class CanvasComponent {
 
   public setPropertiesPanel(propertiesPanel: PropertiesPanelComponent) {
     this.propertiesPanel = propertiesPanel;
-  }
-
-  public setEventHandlers(canvasEventHandlers: CanvasEventHandlers) {
-    this.canvasEventHandlers = canvasEventHandlers;
   }
 
   private handleElementSelected(element: fabric.Object) {

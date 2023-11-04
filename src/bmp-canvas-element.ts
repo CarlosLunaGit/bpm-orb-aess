@@ -59,39 +59,33 @@ export class BPMApp extends LitElement {
         },
       };
       const stateManager = new CanvasStateManager(initialState);
-    
-      // Initialize propertiesPanel and canvasEventHandlers
-      // const propertiesPanel = new PropertiesPanelComponent(
-      //   null, // Temporarily pass null
-      //   this.shadowRoot,
-      //   "propertiesFormElement"
-      // );
 
-      const canvasEventHandlers = new CanvasEventHandlers(
-        null,
-        stateManager
-      );
-    
-      // Pass the required arguments to the canvas component
-      this.canvasComponent = new CanvasComponent(
-        canvasEl.id, // Assuming canvasEl.id is the ID of the canvas element
-        // propertiesPanel,
-        stateManager,
-        canvasEventHandlers
-      );
-
-      // Initialize propertiesPanel without canvasComponent
+      // Initialize propertiesPanel with null for canvasComponent
       const propertiesPanel = new PropertiesPanelComponent(
         this.shadowRoot,
         "propertiesFormElement"
       );
 
+      // Initialize canvasEventHandlers with a setter for the canvasComponent
+      const canvasEventHandlers = new CanvasEventHandlers(
+        canvasEl as HTMLCanvasElement,
+        stateManager,
+        (canvasComponent) => {
+          this.canvasComponent = canvasComponent;
+        }
+      );
+
+      // Now create the canvasComponent with all required dependencies
+      this.canvasComponent = new CanvasComponent(
+        canvasEl.id, // Assuming canvasEl.id is the ID of the canvas element
+        stateManager
+      );
+
+      // Bind the canvasComponent to the propertiesPanel and canvasEventHandlers
       propertiesPanel.bindToCanvas(this.canvasComponent);
+      canvasEventHandlers.setCanvasComponentInstance(this.canvasComponent);
 
-      this.canvasComponent.setPropertiesPanel(propertiesPanel);
-
-      canvasEventHandlers.canvas = this.canvasComponent ; // Assign the propertiesPanel to canvasComponent
-      canvasEventHandlers.initialize();
+      // Initialize the sidebar component
 
       new SidebarComponent(this.canvasComponent, this.shadowRoot);
 
