@@ -1,5 +1,6 @@
 import { LitElement, css, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
+
 import { CanvasStateManager, CanvasState } from "./store/state";
 import { CanvasComponent } from "./components/canvas/canvas";
 import { SidebarComponent } from "./components/sidebar/sidebar";
