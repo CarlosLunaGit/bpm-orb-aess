@@ -7,22 +7,18 @@ import { CanvasStateManager, CanvasAction } from '../../store/state';
  * Handles canvas-specific events and updates the state accordingly.
  */
 export class CanvasEventHandlers {
-    private canvas: fabric.Canvas;
+    public canvas: fabric.Canvas;
     private stateManager: CanvasStateManager;
     private setCanvasComponent: (canvasComponent: any) => void; // Add a setter for the canvas component
 
-    constructor(canvas: fabric.Canvas, stateManager: CanvasStateManager, setCanvasComponent: (canvasComponent: any) => void) {
-        this.canvas = canvas;
+    constructor(canvasComponent: fabric.Canvas, stateManager: CanvasStateManager) {
+        this.canvas = canvasComponent.canvas;
         this.stateManager = stateManager;
-        this.setCanvasComponent = setCanvasComponent; // Store the setter
+   
     }
 
-  // Call this method after all components have been instantiated
-  public setCanvasComponentInstance(canvasComponent: any): void {
-    this.setCanvasComponent(canvasComponent);
-  }
 
-  private initialize(): void {
+  public initialize(): void {
     this.addCanvasEventListeners();
   }
 
@@ -53,7 +49,7 @@ export class CanvasEventHandlers {
 
     // Context menu event listener
     this.canvas.on("mouse:down", (options) => {
-        if (options.e?.button === 3) {
+        if (options.e?.button === 2) {
           // Right-click
           options.e.preventDefault(); // Prevent the default right-click context menu
           options.e.stopPropagation(); // Stop the event from bubbling up
@@ -89,8 +85,8 @@ export class CanvasEventHandlers {
     const contextMenu = document.createElement("div");
     contextMenu.id = "customContextMenu";
     contextMenu.style.position = "absolute";
-    contextMenu.style.left = `${x}px`;
-    contextMenu.style.top = `${y}px`;
+    contextMenu.style.left = `${x+10}px`;
+    contextMenu.style.top = `${y+10}px`;
     contextMenu.style.zIndex = "9999";
     contextMenu.innerHTML = `
     <div class="context-menu-item">

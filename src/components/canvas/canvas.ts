@@ -9,133 +9,6 @@ import { CanvasEventHandlers } from "./canvasEventHandlers";
 import { PropertiesPanelComponent } from "../proprertiesPanel/propertiesPanel";
 import "fabric-history";
 
-// export class CanvasComponent {
-
-//   public canvasEventHandlers: CanvasEventHandlers;
-
-//   /**
-//    * Initializes a new instance of the CanvasComponent class.
-//    * @param {string} canvasId - The ID of the HTML canvas element.
-//    */
-//   constructor(
-//     canvasId: string,
-//     stateManager: CanvasStateManager,
-//   ) {
-
-//     // Call the addEventListeners method here
-//     this.addEventListeners();
-
-//   }
-
-//   public setPropertiesPanel(propertiesPanel: PropertiesPanelComponent) {
-//     this.propertiesPanel = propertiesPanel;
-//   }
-
-//   private handleElementSelected(element: fabric.Object) {
-//     // Emit an event or call a callback function here
-//     // For example:
-//     this.onElementSelected?.(element);
-//   }
-
-//   /**
-//    * Adds event listeners to the canvas for handling object interactions.
-//    * @private
-//    */
-//   private addEventListeners(): void {
-//     // Listen for the 'delete' key to remove the selected object
-//     document.addEventListener("keydown", (e) => {
-//       if (e.key === "Delete" && this.canvas.getActiveObject()) {
-//         this.canvas.remove(this.canvas.getActiveObject());
-//         this.canvas.renderAll();
-//       }
-
-//       if (e.keyCode === 90) {
-//         this.canvas.undo();
-//       }
-
-//       // Check pressed button is Y - Ctrl+Y.
-//       if (e.keyCode === 89) {
-//         this.canvas.redo();
-//       }
-//     });
-//   }
-
-//   /**
-//    * Enable controls for resizing, rotating, and other interactions.
-//    * @param object - The selected fabric object.
-//    * @private
-//    */
-//   private enableObjectControls(object: fabric.Object): void {
-//     object.set({
-//       hasBorders: true,
-//       hasControls: true,
-//       lockMovementX: false,
-//       lockMovementY: false,
-//       lockRotation: false,
-//       lockScalingX: false,
-//       lockScalingY: false,
-//       lockUniScaling: false,
-//       selectable: true,
-//     });
-//   }
-
-//   /**
-//    * Zooms in the canvas.
-//    */
-//   zoomIn(): void {
-//     let zoom = this.canvas.getZoom();
-//     zoom = zoom + 0.1;
-//     this.canvas.setZoom(zoom);
-//   }
-
-//   /**
-//    * Zooms out the canvas.
-//    */
-//   zoomOut(): void {
-//     let zoom = this.canvas.getZoom();
-//     if (zoom > 0.1) {
-//       zoom = zoom - 0.1;
-//       this.canvas.setZoom(zoom);
-//     }
-//   }
-
-//   /**
-//    * Updates the element on the canvas.
-//    * @param {fabric.Object} element - The element to update.
-//    */
-//   public updateElement(element: fabric.Object): void {
-//     const activeObject = this.canvas.getActiveObject();
-//     if (activeObject && activeObject.type === element.type) {
-//       activeObject.set(element);
-//       this.canvas.renderAll();
-//     }
-//   }
-
-//   // Method to move an element
-//   moveElement(element: fabric.Object, newPosition: { x: number; y: number }) {
-//     element.set({ left: newPosition.x, top: newPosition.y });
-//     this.canvas.renderAll();
-//     this.handleStateUpdate('move', element);
-//   }
-
-//   // Method to resize an element
-//   resizeElement(
-//     element: fabric.Object,
-//     newSize: { width: number; height: number }
-//   ) {
-//     element.set({ width: newSize.width, height: newSize.height });
-//     this.canvas.renderAll();
-//     this.handleStateUpdate('resize', element);
-//   }
-
-//   // Method to delete an element
-//   deleteElement(element: fabric.Object) {
-//     this.canvas.remove(element);
-//     this.handleStateUpdate('delete', element);
-//   }
-
-// }
-
 export class CanvasComponent {
   public canvas: fabric.Canvas;
   public state: CanvasState;
@@ -152,7 +25,12 @@ export class CanvasComponent {
     this.canvas = new fabric.Canvas(canvasElement, {
       backgroundColor: "white",
       selection: true,
+      fireRightClick: true,  // <-- enable firing of right click events
+      fireMiddleClick: true, // <-- enable firing of middle click events
+      stopContextMenu: true, // <--  prevent context menu from showing
     });
+
+    
 
     this.setCanvasSize();
     window.addEventListener("resize", this.setCanvasSize.bind(this));
@@ -160,6 +38,8 @@ export class CanvasComponent {
     this.setGridBackground();
 
     this.enableSnapToGrid();
+
+    this.addKeyboardListeners();
 
     this.stateManager = instanceStateManager;
 
@@ -179,7 +59,7 @@ export class CanvasComponent {
    */
   public postAddShape(shape: fabric.Object): void {
     shape.on("selected", (event) => {
-      this.propertiesPanel?.setSelectedElement(event.target);
+      this.handleElementSelected(event.target);
     });
 
     this.canvas.add(shape);
@@ -337,5 +217,108 @@ export class CanvasComponent {
     } catch (error) {
       return false;
     }
+  }
+
+  /**
+   * Enable controls for resizing, rotating, and other interactions.
+   * @param object - The selected fabric object.
+   * @private
+   */
+  private enableObjectControls(object: fabric.Object): void {
+    object.set({
+      hasBorders: true,
+      hasControls: true,
+      lockMovementX: false,
+      lockMovementY: false,
+      lockRotation: false,
+      lockScalingX: false,
+      lockScalingY: false,
+      lockUniScaling: false,
+      selectable: true,
+    });
+  }
+
+  private handleElementSelected(element: fabric.Object) {
+    // Emit an event or call a callback function here
+    // For example:
+    this.onElementSelected?.(element);
+  }
+
+  /**
+   * Adds event listeners to the canvas for handling object interactions.
+   * @private
+   */
+  private addKeyboardListeners(): void {
+    // Listen for the 'delete' key to remove the selected object
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Delete" && this.canvas.getActiveObject()) {
+        this.canvas.remove(this.canvas.getActiveObject());
+        this.canvas.renderAll();
+      }
+
+      if (e.keyCode === 90) {
+        this.canvas.undo();
+      }
+
+      // Check pressed button is Y - Ctrl+Y.
+      if (e.keyCode === 89) {
+        this.canvas.redo();
+      }
+    });
+  }
+
+  /**
+   * Zooms in the canvas.
+   */
+  zoomIn(): void {
+    let zoom = this.canvas.getZoom();
+    zoom = zoom + 0.1;
+    this.canvas.setZoom(zoom);
+  }
+
+  /**
+   * Zooms out the canvas.
+   */
+  zoomOut(): void {
+    let zoom = this.canvas.getZoom();
+    if (zoom > 0.1) {
+      zoom = zoom - 0.1;
+      this.canvas.setZoom(zoom);
+    }
+  }
+
+  /**
+   * Updates the element on the canvas.
+   * @param {fabric.Object} element - The element to update.
+   */
+  public updateElement(element: fabric.Object): void {
+    const activeObject = this.canvas.getActiveObject();
+    if (activeObject && activeObject.type === element.type) {
+      activeObject.set(element);
+      this.canvas.renderAll();
+    }
+  }
+
+  // Method to move an element
+  moveElement(element: fabric.Object, newPosition: { x: number; y: number }) {
+    element.set({ left: newPosition.x, top: newPosition.y });
+    this.canvas.renderAll();
+    this.handleStateUpdate("move", element);
+  }
+
+  // Method to resize an element
+  resizeElement(
+    element: fabric.Object,
+    newSize: { width: number; height: number }
+  ) {
+    element.set({ width: newSize.width, height: newSize.height });
+    this.canvas.renderAll();
+    this.handleStateUpdate("resize", element);
+  }
+
+  // Method to delete an element
+  deleteElement(element: fabric.Object) {
+    this.canvas.remove(element);
+    this.handleStateUpdate("delete", element);
   }
 }

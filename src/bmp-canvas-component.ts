@@ -18,6 +18,7 @@ export class BPMApp extends LitElement {
   public canvasComponent: any;
   public canvasOperations: CanvasOperations;
   public eventHandlers: EventHandlers;
+  public canvasEventHandlers: CanvasEventHandlers;
 
   async connectedCallback() {
     super.connectedCallback();
@@ -48,24 +49,22 @@ export class BPMApp extends LitElement {
       "propertiesFormElement"
     );
 
-    // Initialize canvasEventHandlers with a setter for the canvasComponent
-    const canvasEventHandlers = new CanvasEventHandlers(
-      canvasEl as HTMLCanvasElement,
-      stateManager,
-      (canvasComponent) => {
-        this.canvasComponent = canvasComponent;
-      }
-    );
-
     // Now create the canvasComponent with all required dependencies
     this.canvasComponent = new CanvasComponent(
       canvasEl, // Assuming canvasEl.id is the ID of the canvas element
       stateManager
     );
 
+    // Initialize canvasEventHandlers with a setter for the canvasComponent
+    const canvasEventHandlers = new CanvasEventHandlers(
+        this.canvasComponent,
+        stateManager
+      );
+
     // Bind the canvasComponent to the propertiesPanel and canvasEventHandlers
     propertiesPanel.bindToCanvas(this.canvasComponent);
-    canvasEventHandlers.setCanvasComponentInstance(this.canvasComponent);
+
+    canvasEventHandlers.initialize();
 
     this.canvasOperations = new CanvasOperations(this.canvasComponent);
     // After initializing CanvasOperations and SidebarComponent
