@@ -39,6 +39,7 @@ export const bpmAppStyles = css`
 
 #propertiesForm {
   grid-area: mainmenu;
+  padding-inline: 1rem;
 }
 
 #propertiesFormElement {
@@ -157,4 +158,69 @@ button:focus-visible {
   margin-left: 0.7vw !important;
   padding-left: 0.7vw !important;
 }
+
+/* Base styles for the sidebar */
+#sidebar {
+  /* Adjust the sidebar styling as needed */
+  
+  background: #333;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+/* Base styles for the div elements inside the sidebar */
+#sidebar > div {
+  margin-bottom: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  /* Use a box-shadow to create a "lifted" effect on hover */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Hover styles for the div elements */
+#sidebar > div:hover {
+  /* Scale up the div slightly */
+  transform: scale(1.05);
+  /* Add a stronger shadow to give depth */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Styles for the SVG icons to ensure they are centered and have a consistent size */
+#sidebar svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor; /* This makes the SVG icon color inherit from the parent */
+}
+
+/* Additional hover effect for the SVG icons */
+#sidebar > div:hover svg {
+  /* Rotate the icon slightly for a playful effect */
+  transform: rotate(-5deg);
+  transition: transform 0.3s ease;
+}
+
+/* You can add more specific styles for each div if needed, using their IDs */
+#task {
+  background: #333;
+  color: chartreuse;
+}
+
+#event {
+  background: #333;
+  color: gold;
+}
+
+#gateway {
+  background: #333;
+  color: lightblue;
+}
+
+/* Add styles for the toolbar icons if needed */
+#undoIconId,
+#redoIconId,
+#saveIconId,
+#loadIconId {
+  /* Toolbar icon styles */
+}
+
 `;
