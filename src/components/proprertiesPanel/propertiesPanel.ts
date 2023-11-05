@@ -1,5 +1,3 @@
-//import { CanvasComponent } from '../canvas/canvas'; // Adjust the path accordingly
-
 export class PropertiesPanelComponent {
   private selectedElement: any; // This will store the currently selected BPMN element
   private propertiesForm: HTMLFormElement; // This will represent the form element in the DOM

@@ -1,6 +1,4 @@
 import { fabric } from "fabric";
-import { addTask, addEvent, addGateway } from "./bpmnElements";
-import { addDataObject, addDataStore } from "./bpmnDataElements";
 import {
   CanvasState,
   CanvasStateManager,
@@ -12,14 +10,8 @@ import { PropertiesPanelComponent } from "../proprertiesPanel/propertiesPanel";
 import "fabric-history";
 
 // export class CanvasComponent {
-//   public canvas: fabric.Canvas;
-//   private gridSize: number = 20; // Define the size of each grid square
-//   public stateManager: CanvasStateManager;
+
 //   public canvasEventHandlers: CanvasEventHandlers;
-  
-//   public state: CanvasState;
-//   private undoStack: any[] = [];
-//   private redoStack: any[] = [];
 
 //   /**
 //    * Initializes a new instance of the CanvasComponent class.
@@ -30,35 +22,9 @@ import "fabric-history";
 //     stateManager: CanvasStateManager,
 //   ) {
 
-//     this.canvas = new fabric.Canvas(canvasId);
-//     this.state = {
-//       elements: [],
-//       otherFields: {
-//         versionHistory: [],
-//       },
-//     };
-
-//     this.setCanvasSize();
-//     this.canvas.setBackgroundColor(
-//       "white",
-//       this.canvas.renderAll.bind(this.canvas)
-//     );
-
-//     this.canvas.renderAll();
-
-//     // Listen to window resize events
-//     window.addEventListener("resize", this.setCanvasSize.bind(this));
-
-//     this.setGridBackground();
-
-//     this.enableSnapToGrid();
-
 //     // Call the addEventListeners method here
 //     this.addEventListeners();
 
-//     this.stateManager = stateManager;
-//     // this.canvasEventHandlers = canvasEventHandlers;
-    
 //   }
 
 //   public setPropertiesPanel(propertiesPanel: PropertiesPanelComponent) {
@@ -69,109 +35,6 @@ import "fabric-history";
 //     // Emit an event or call a callback function here
 //     // For example:
 //     this.onElementSelected?.(element);
-//   }
-
-//   private setCanvasSize(): void {
-//     // Access the shadow root of the 'bpm-app' custom element
-//     const shadowRoot = document.getElementsByTagName("bpm-app")[0]?.shadowRoot;
-
-//     if (!shadowRoot) {
-//       console.error("Shadow root not found!");
-//       return;
-//     }
-
-//     // Get the widths of the sidebar and properties panel inside the Shadow DOM
-//     const sidebarWidth = shadowRoot.getElementById("sidebar")?.clientWidth || 0;
-//     const propertiesPanelHeight =
-//       shadowRoot.getElementById("propertiesFormElement")?.clientHeight || 0;
-
-//     // Calculate the available width and height for the canvas
-//     const containerWidth =
-//       (window.innerWidth > 0 ? window.innerWidth : screen.width) - sidebarWidth;
-//     const containerHeight =
-//       window.innerHeight > 0
-//         ? window.innerHeight
-//         : screen.height - propertiesPanelHeight; // Adjust this if you have horizontal elements
-
-//     this.canvas.setDimensions({
-//       width: containerWidth,
-//       height: containerHeight,
-//     });
-//     this.setGridBackground();
-//   }
-
-
-
-
-
-//   /**
-//    * Common logic to execute after adding a shape.
-//    * @param {fabric.Object} shape - The newly added shape.
-//    */
-//   private postAddShape(shape: fabric.Object): void {
-//     shape.on("selected", (event) => {
-//       this.propertiesPanel?.setSelectedElement(event.target);
-//     });
-
-//     this.canvas.add(shape);
-//     this.undoStack.push({ action: "addElement", element: shape });
-//     this.redoStack = [];
-//     this.handleStateUpdate('add', shape);
-//   }
-
-//   /**
-//    * Sets a repeating grid background image for the canvas.
-//    */
-//   public setGridBackground(): void {
-//     if (this.canvas.width === 0 || this.canvas.height === 0) {
-//       console.warn("Canvas dimensions are zero. Grid background not set.");
-//       return;
-//     }
-//     const gridSize = this.gridSize;
-//     const gridCanvas = document.createElement("canvas");
-//     gridCanvas.width = this.canvas.width;
-//     gridCanvas.height = this.canvas.height;
-//     const ctx = gridCanvas.getContext("2d");
-//     if (ctx) {
-//       ctx.strokeStyle = "#ebebeb";
-//       ctx.lineWidth = 1;
-//       for (let i = 0; i < this.canvas.width; i += gridSize) {
-//         ctx.moveTo(i, 0);
-//         ctx.lineTo(i, this.canvas.height);
-//       }
-//       for (let j = 0; j < this.canvas.height; j += gridSize) {
-//         ctx.moveTo(0, j);
-//         ctx.lineTo(this.canvas.width, j);
-//       }
-//       ctx.stroke();
-//     }
-
-//     const gridImg = new Image();
-//     gridImg.src = gridCanvas.toDataURL();
-
-//     gridImg.onload = () => {
-//       this.canvas.setBackgroundImage(
-//         gridImg.src,
-//         this.canvas.renderAll.bind(this.canvas),
-//         {
-//           width: this.canvas.width, // Set to gridSize
-//           height: this.canvas.height, // Set to gridSize
-//           repeat: "repeat",
-//         }
-//       );
-//     };
-//   }
-
-//   /**
-//    * Enables snap-to-grid functionality.
-//    */
-//   private enableSnapToGrid(): void {
-//     this.canvas.on("object:moving", (options) => {
-//       options.target.set({
-//         left: Math.round(options.target.left / this.gridSize) * this.gridSize,
-//         top: Math.round(options.target.top / this.gridSize) * this.gridSize,
-//       });
-//     });
 //   }
 
 //   /**
@@ -195,76 +58,6 @@ import "fabric-history";
 //         this.canvas.redo();
 //       }
 //     });
-//   }
-
-//   // Helper method to handle undo/redo actions
-//   private handleAction(
-//     action: string,
-//     sourceStack: any[],
-//     targetStack: any[]
-//   ): void {
-//     const lastAction = sourceStack.pop();
-//     if (lastAction) {
-//       if (lastAction.action === "addElement") {
-//         this.canvas[action === "undo" ? "remove" : "add"](lastAction.element);
-//         this.setState({
-//           elements:
-//             action === "undo"
-//               ? this.state.elements.filter((el) => el !== lastAction.element)
-//               : [...this.state.elements, lastAction.element],
-//         });
-//       } else {
-//         // Handle other actions
-//         // Update this.state.otherFields accordingly
-//       }
-//       targetStack.push(lastAction);
-//     }
-//   }
-
-//   undo(): void {
-//     this.handleAction("undo", this.undoStack, this.redoStack);
-//   }
-
-//   redo(): void {
-//     this.handleAction("redo", this.redoStack, this.undoStack);
-//   }
-
-//   // Helper method to update state
-//   setState(newState: Partial<CanvasState>) {
-//     this.state = { ...this.state, ...newState };
-//   }
-
-//   /**
-//    * Saves the current state of the canvas to localStorage.
-//    */
-//   saveCanvasState() {
-//     try {
-//       const canvasJSON = this.canvas.toJSON();
-//       localStorage.setItem("canvasState", JSON.stringify(canvasJSON));
-//       return true;
-//     } catch (error) {
-//       return false;
-//     }
-//   }
-
-//   /**
-//    * Loads the saved state of the canvas from localStorage.
-//    */
-//   loadCanvasState() {
-//     try {
-//       const savedCanvas = localStorage.getItem("canvasState");
-//       if (savedCanvas) {
-//         this.canvas.loadFromJSON(
-//           JSON.parse(savedCanvas),
-//           this.canvas.renderAll.bind(this.canvas)
-//         );
-//       } else {
-//         console.warn("No saved canvas state found in localStorage.");
-//       }
-//       return true;
-//     } catch (error) {
-//       return false;
-//     }
 //   }
 
 //   /**
@@ -341,33 +134,34 @@ import "fabric-history";
 //     this.handleStateUpdate('delete', element);
 //   }
 
-//   // Method to update CanvasState
-//   private handleStateUpdate(actionType: string, element: fabric.Object): void {
-//     const action: CanvasAction = {
-//       type: actionType,
-//       object: element,
-//       // Include 'from' and 'to' if necessary for the action type
-//     };
-//     this.stateManager.updateState(action);
-//   }
 // }
 
 export class CanvasComponent {
   public canvas: fabric.Canvas;
   public state: CanvasState;
+  public stateManager: CanvasStateManager;
+  private undoStack: any[] = [];
+  private redoStack: any[] = [];
+  private gridSize: number = 20;
 
-    /**
+  /**
    * Initializes a new instance of the CanvasComponent class.
    * @param {string} canvasElement - The HTML canvas element.
    */
-  constructor(
-    canvasElement: string,
-    stateManager: CanvasStateManager,
-  ) {
+  constructor(canvasElement: string, instanceStateManager: CanvasStateManager) {
     this.canvas = new fabric.Canvas(canvasElement, {
       backgroundColor: "white",
       selection: true,
     });
+
+    this.setCanvasSize();
+    window.addEventListener("resize", this.setCanvasSize.bind(this));
+
+    this.setGridBackground();
+
+    this.enableSnapToGrid();
+
+    this.stateManager = instanceStateManager;
 
     this.state = {
       elements: [],
@@ -376,10 +170,172 @@ export class CanvasComponent {
       },
     };
 
-    
-
     this.canvas.renderAll();
   }
 
-  
+  /**
+   * Common logic to execute after adding a shape.
+   * @param {fabric.Object} shape - The newly added shape.
+   */
+  public postAddShape(shape: fabric.Object): void {
+    shape.on("selected", (event) => {
+      this.propertiesPanel?.setSelectedElement(event.target);
+    });
+
+    this.canvas.add(shape);
+    this.undoStack.push({ action: "addElement", element: shape });
+    this.redoStack = [];
+    this.handleStateUpdate("add", shape);
+  }
+
+  public setCanvasSize(): void {
+    // Access the shadow root of the 'bpm-app' custom element
+    const shadowRoot = document.getElementsByTagName("bpm-app")[0]?.shadowRoot;
+
+    if (!shadowRoot) {
+      console.error("Shadow root not found!");
+      return;
+    }
+
+    this.canvas.setDimensions({
+      width: shadowRoot.getElementById("canvasContainer")?.clientWidth,
+      height: shadowRoot.getElementById("canvasContainer")?.clientHeight,
+    });
+    this.setGridBackground();
+  }
+
+  /**
+   * Sets a repeating grid background image for the canvas.
+   */
+  public setGridBackground(): void {
+    if (this.canvas.width === 0 || this.canvas.height === 0) {
+      console.warn("Canvas dimensions are zero. Grid background not set.");
+      return;
+    }
+    const gridSize = this.gridSize;
+    const gridCanvas = document.createElement("canvas");
+    gridCanvas.width = this.canvas.width;
+    gridCanvas.height = this.canvas.height;
+    const ctx = gridCanvas.getContext("2d");
+    if (ctx) {
+      ctx.strokeStyle = "#ebebeb";
+      ctx.lineWidth = 1;
+      for (let i = 0; i < this.canvas.width; i += gridSize) {
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, this.canvas.height);
+      }
+      for (let j = 0; j < this.canvas.height; j += gridSize) {
+        ctx.moveTo(0, j);
+        ctx.lineTo(this.canvas.width, j);
+      }
+      ctx.stroke();
+    }
+
+    const gridImg = new Image();
+    gridImg.src = gridCanvas.toDataURL();
+
+    gridImg.onload = () => {
+      this.canvas.setBackgroundImage(
+        gridImg.src,
+        this.canvas.renderAll.bind(this.canvas),
+        {
+          width: this.canvas.width, // Set to gridSize
+          height: this.canvas.height, // Set to gridSize
+          repeat: "repeat",
+        }
+      );
+    };
+  }
+
+  /**
+   * Enables snap-to-grid functionality.
+   */
+  private enableSnapToGrid(): void {
+    this.canvas.on("object:moving", (options) => {
+      options.target.set({
+        left: Math.round(options.target.left / this.gridSize) * this.gridSize,
+        top: Math.round(options.target.top / this.gridSize) * this.gridSize,
+      });
+    });
+  }
+
+  undo(): void {
+    this.handleAction("undo", this.undoStack, this.redoStack);
+  }
+
+  redo(): void {
+    this.handleAction("redo", this.redoStack, this.undoStack);
+  }
+
+  // Helper method to handle undo/redo actions
+  private handleAction(
+    action: string,
+    sourceStack: any[],
+    targetStack: any[]
+  ): void {
+    const lastAction = sourceStack.pop();
+    if (lastAction) {
+      if (lastAction.action === "addElement") {
+        this.canvas[action === "undo" ? "remove" : "add"](lastAction.element);
+        this.setState({
+          elements:
+            action === "undo"
+              ? this.state.elements.filter((el) => el !== lastAction.element)
+              : [...this.state.elements, lastAction.element],
+        });
+      } else {
+        // Handle other actions
+        // Update this.state.otherFields accordingly
+      }
+      targetStack.push(lastAction);
+    }
+  }
+
+  // Helper method to update state
+  private setState(newState: Partial<CanvasState>) {
+    this.state = { ...this.state, ...newState };
+  }
+
+  // Method to update CanvasState
+  private handleStateUpdate(actionType: string, element: fabric.Object): void {
+    const action: CanvasAction = {
+      type: actionType,
+      object: element,
+      // Include 'from' and 'to' if necessary for the action type
+    };
+    this.stateManager.updateState(action);
+  }
+
+  /**
+   * Saves the current state of the canvas to localStorage.
+   */
+  public saveCanvasState() {
+    try {
+      const canvasJSON = this.canvas.toJSON();
+      localStorage.setItem("canvasState", JSON.stringify(canvasJSON));
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * Loads the saved state of the canvas from localStorage.
+   */
+  public loadCanvasState() {
+    try {
+      const savedCanvas = localStorage.getItem("canvasState");
+      if (savedCanvas) {
+        this.canvas.loadFromJSON(
+          JSON.parse(savedCanvas),
+          this.canvas.renderAll.bind(this.canvas)
+        );
+      } else {
+        console.warn("No saved canvas state found in localStorage.");
+      }
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
 }

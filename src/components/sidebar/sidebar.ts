@@ -1,25 +1,35 @@
+import { CanvasOperations } from "./components/canvas/canvasOperations";
+
 export class SidebarComponent {
-    constructor(private canvasComponent: CanvasComponent, private shadowRoot: ShadowRoot | null) {
-        // Bind the drag and drop events to the BPMN shapes in the sidebar
+    private canvasOperations: CanvasOperations | null = null;
+
+    constructor(private shadowRoot: ShadowRoot | null) {
+        // Event listeners will be bound later after canvasOperations is set
+    }
+
+    public bindToCanvasOperations(canvasOperations: CanvasOperations) {
+        this.canvasOperations = canvasOperations;
+
+        // Now that we have canvasOperations, we can bind the drag and drop events
         this.shadowRoot?.querySelector('#task')?.addEventListener('dragend', () => {
-            this.canvasComponent.addElement('Task');
+            this.canvasOperations.addElement('Task');
         });
 
         this.shadowRoot?.querySelector('#event')?.addEventListener('dragend', () => {
-            this.canvasComponent.addElement('Event');
+            this.canvasOperations.addElement('Event');
         });
 
         this.shadowRoot?.querySelector('#gateway')?.addEventListener('dragend', () => {
-            this.canvasComponent.addElement('Gateway');
+            this.canvasOperations.addElement('Gateway');
         });
 
         // Bind the undo and redo actions to the respective icons
         this.shadowRoot?.querySelector('#undo-icon')?.addEventListener('click', () => {
-            this.canvasComponent.undo();
+            this.canvasOperations.undo();
         });
 
         this.shadowRoot?.querySelector('#redo-icon')?.addEventListener('click', () => {
-            this.canvasComponent.redo();
+            this.canvasOperations.redo();
         });
     }
 }

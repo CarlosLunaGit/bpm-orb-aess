@@ -10,7 +10,7 @@ fabric.Task = fabric.util.createClass(fabric.Rect, {
 
   toObject: function () {
     return fabric.util.object.extend(this.callSuper("toObject"), {
-      // any additional properties you want to include when converting to JSON
+        // name: this.get('name')
     });
   },
 

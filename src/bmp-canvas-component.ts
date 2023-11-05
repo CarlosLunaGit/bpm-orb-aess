@@ -15,6 +15,9 @@ import { fabric } from "fabric";
 @customElement("bpm-app")
 export class BPMApp extends LitElement {
   private fabricCanvas?: fabric.Canvas;
+  public canvasComponent: any;
+  public canvasOperations: CanvasOperations;
+  public eventHandlers: EventHandlers;
 
   async connectedCallback() {
     super.connectedCallback();
@@ -56,20 +59,21 @@ export class BPMApp extends LitElement {
 
     // Now create the canvasComponent with all required dependencies
     this.canvasComponent = new CanvasComponent(
-        canvasEl, // Assuming canvasEl.id is the ID of the canvas element
-        stateManager
-      );
+      canvasEl, // Assuming canvasEl.id is the ID of the canvas element
+      stateManager
+    );
 
     // Bind the canvasComponent to the propertiesPanel and canvasEventHandlers
     propertiesPanel.bindToCanvas(this.canvasComponent);
     canvasEventHandlers.setCanvasComponentInstance(this.canvasComponent);
 
-    // Initialize the sidebar component
-
-    new SidebarComponent(this.canvasComponent, this.shadowRoot);
-
     this.canvasOperations = new CanvasOperations(this.canvasComponent);
-    this.canvasOperations.initializeCanvas(canvasEl as HTMLCanvasElement);
+    // After initializing CanvasOperations and SidebarComponent
+    const sidebarComponent = new SidebarComponent(this.shadowRoot);
+    sidebarComponent.bindToCanvasOperations(this.canvasOperations);
+
+    // this.canvasOperations = new CanvasOperations(this.canvasComponent);
+    // this.canvasOperations.initializeCanvas(canvasEl as HTMLCanvasElement);
 
     this.eventHandlers = new EventHandlers(
       this.canvasComponent,
@@ -79,7 +83,7 @@ export class BPMApp extends LitElement {
   }
 
   render() {
-    return bpmAppTemplate();
+    return bpmAppTemplate({});
   }
 
   static styles = [bpmAppStyles];
