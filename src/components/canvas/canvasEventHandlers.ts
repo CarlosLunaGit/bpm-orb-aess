@@ -1,23 +1,24 @@
 // src/components/canvas/canvasEventHandlers.ts
 
 import { fabric } from "fabric";
-import { CanvasStateManager, CanvasAction } from '../../store/state';
+import { CanvasStateManager, CanvasAction } from "../../store/state";
 
 /**
  * Handles canvas-specific events and updates the state accordingly.
  */
 export class CanvasEventHandlers {
-    public canvas: fabric.Canvas;
-    private stateManager: CanvasStateManager;
-    public canvasComponent: fabric.Canvas; // Add a setter for the canvas component
+  public canvas: fabric.Canvas;
+  private stateManager: CanvasStateManager;
+  public canvasComponent: fabric.Canvas; // Add a setter for the canvas component
 
-    constructor(canvasComponent: fabric.Canvas, stateManager: CanvasStateManager) {
-        this.canvas = canvasComponent.canvas;
-        this.stateManager = stateManager;
-        this.canvasComponent = canvasComponent;
-   
-    }
-
+  constructor(
+    canvasComponent: fabric.Canvas,
+    stateManager: CanvasStateManager
+  ) {
+    this.canvas = canvasComponent.canvas;
+    this.stateManager = stateManager;
+    this.canvasComponent = canvasComponent;
+  }
 
   public initialize(): void {
     this.addCanvasEventListeners();
@@ -30,26 +31,34 @@ export class CanvasEventHandlers {
     });
 
     this.canvas.on("object:added", (event) => {
-        this.handleObjectAdded(event)
-      });
+      if (!this.stateManager.isUndoRedoOperation) {
+        this.handleObjectAdded(event);
+      }
+    });
+
+    this.canvas.on("object:removed", (event) => {
+      if (!this.stateManager.isUndoRedoOperation) {
+        // this.handleObjectAdded(event);
+      }
+    });
 
     //object:modified at the end of a transform or any change when statefull is true
     this.canvas.on("object:modified", (event) => {
-       this.handleObjectMoved(event)
+      if (!this.stateManager.isUndoRedoOperation) {
+        this.handleObjectMoved(event)
+      }
     });
-
 
     // Context menu event listener
     this.canvas.on("mouse:down", (options) => {
-        if (options.e?.button === 2) {
-          // Right-click
-          options.e.preventDefault(); // Prevent the default right-click context menu
-          options.e.stopPropagation(); // Stop the event from bubbling up
-          // Show context menu and get selected action
-          this.handleContextMenu(options.e.clientX, options.e.clientY);
-        }
-      });
-    
+      if (options.e?.button === 2) {
+        // Right-click
+        options.e.preventDefault(); // Prevent the default right-click context menu
+        options.e.stopPropagation(); // Stop the event from bubbling up
+        // Show context menu and get selected action
+        this.handleContextMenu(options.e.clientX, options.e.clientY);
+      }
+    });
   }
 
   private handleObjectAdded(event: fabric.IEvent): void {
@@ -57,9 +66,9 @@ export class CanvasEventHandlers {
     const object = event.target;
     if (object) {
       const action: CanvasAction = {
-        type: 'add',
+        type: "add",
         object: object,
-        from: { left: object.left, top: object.top},
+        from: { left: object.left, top: object.top },
         to: { left: object.left, top: object.top },
       };
       this.stateManager.updateState(action);
@@ -71,9 +80,12 @@ export class CanvasEventHandlers {
     const object = event.target;
     if (object) {
       const action: CanvasAction = {
-        type: 'move',
+        type: "move",
         object: object,
-        from: { left: object._stateProperties.left, top: object._stateProperties.top },
+        from: {
+          left: object._stateProperties.left,
+          top: object._stateProperties.top,
+        },
         to: { left: object.left, top: object.top },
       };
       this.stateManager.updateState(action);
@@ -91,8 +103,8 @@ export class CanvasEventHandlers {
     const contextMenu = document.createElement("div");
     contextMenu.id = "customContextMenu";
     contextMenu.style.position = "absolute";
-    contextMenu.style.left = `${x+10}px`;
-    contextMenu.style.top = `${y+10}px`;
+    contextMenu.style.left = `${x + 10}px`;
+    contextMenu.style.top = `${y + 10}px`;
     contextMenu.style.zIndex = "9999";
     contextMenu.innerHTML = `
     <div class="context-menu-item">
@@ -108,18 +120,21 @@ export class CanvasEventHandlers {
     document.body.appendChild(contextMenu);
 
     // Listen for menu item clicks
-    contextMenu.addEventListener('click', (e) => {
+    contextMenu.addEventListener("click", (e) => {
       const target = e.target as HTMLElement;
       const selectedAction = target.id;
       document.body.removeChild(contextMenu);
 
       // Trigger the corresponding action
       const activeElement = this.canvas.getActiveObject();
-      if (selectedAction === 'move') {
+      if (selectedAction === "move") {
         this.canvasComponent.moveElement(activeElement, { x: 100, y: 100 });
-      } else if (selectedAction === 'resize') {
-        this.canvasComponent.resizeElement(activeElement, { width: 50, height: 50 });
-      } else if (selectedAction === 'delete') {
+      } else if (selectedAction === "resize") {
+        this.canvasComponent.resizeElement(activeElement, {
+          width: 50,
+          height: 50,
+        });
+      } else if (selectedAction === "delete") {
         this.canvasComponent.deleteElement(activeElement);
       }
     });
@@ -131,5 +146,4 @@ export class CanvasEventHandlers {
       }
     });
   }
-
 }

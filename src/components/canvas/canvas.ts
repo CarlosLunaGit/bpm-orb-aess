@@ -136,12 +136,12 @@ export class CanvasComponent {
 
   undo(): void {
     this.stateManager.undo();
-    this.canvas.renderAll();
+    // this.canvas.renderAll();
   }
 
   redo(): void {
     this.stateManager.redo();
-    this.canvas.renderAll();
+    // this.canvas.renderAll();
   }
 
   // Method to update CanvasState
