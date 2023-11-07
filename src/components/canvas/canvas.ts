@@ -136,12 +136,10 @@ export class CanvasComponent {
 
   undo(): void {
     this.stateManager.undo();
-    // this.canvas.renderAll();
   }
 
   redo(): void {
     this.stateManager.redo();
-    // this.canvas.renderAll();
   }
 
   // Method to update CanvasState
@@ -193,25 +191,6 @@ export class CanvasComponent {
     }
   }
 
-  /**
-   * Enable controls for resizing, rotating, and other interactions.
-   * @param object - The selected fabric object.
-   * @private
-   */
-  private enableObjectControls(object: fabric.Object): void {
-    object.set({
-      hasBorders: true,
-      hasControls: true,
-      lockMovementX: false,
-      lockMovementY: false,
-      lockRotation: false,
-      lockScalingX: false,
-      lockScalingY: false,
-      lockUniScaling: false,
-      selectable: true,
-    });
-  }
-
   private handleElementSelected(element: fabric.Object) {
     // Emit an event or call a callback function here
     // For example:
@@ -227,7 +206,6 @@ export class CanvasComponent {
     document.addEventListener("keydown", (e) => {
       if (e.key === "Delete" && this.canvas.getActiveObject()) {
         this.canvas.remove(this.canvas.getActiveObject());
-        this.canvas.renderAll();
       }
 
       if (e.keyCode === 90) {

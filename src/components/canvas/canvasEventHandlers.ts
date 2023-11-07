@@ -38,7 +38,7 @@ export class CanvasEventHandlers {
 
     this.canvas.on("object:removed", (event) => {
       if (!this.stateManager.isUndoRedoOperation) {
-        // this.handleObjectAdded(event);
+        this.handleObjectRemoved(event);
       }
     });
 
@@ -67,6 +67,20 @@ export class CanvasEventHandlers {
     if (object) {
       const action: CanvasAction = {
         type: "add",
+        object: object,
+        from: { left: object.left, top: object.top },
+        to: { left: object.left, top: object.top },
+      };
+      this.stateManager.updateState(action);
+    }
+  }
+
+  private handleObjectRemoved(event: fabric.IEvent): void {
+    // Handle object added event
+    const object = event.target;
+    if (object) {
+      const action: CanvasAction = {
+        type: "remove",
         object: object,
         from: { left: object.left, top: object.top },
         to: { left: object.left, top: object.top },
