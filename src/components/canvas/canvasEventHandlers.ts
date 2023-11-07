@@ -29,6 +29,10 @@ export class CanvasEventHandlers {
       //   this.saveState();
     });
 
+    this.canvas.on("object:added", (event) => {
+        this.handleObjectAdded(event)
+      });
+
     //object:modified at the end of a transform or any change when statefull is true
     this.canvas.on("object:modified", (event) => {
        this.handleObjectMoved(event)
@@ -46,6 +50,20 @@ export class CanvasEventHandlers {
         }
       });
     
+  }
+
+  private handleObjectAdded(event: fabric.IEvent): void {
+    // Handle object added event
+    const object = event.target;
+    if (object) {
+      const action: CanvasAction = {
+        type: 'add',
+        object: object,
+        from: { left: object.left, top: object.top},
+        to: { left: object.left, top: object.top },
+      };
+      this.stateManager.updateState(action);
+    }
   }
 
   private handleObjectMoved(event: fabric.IEvent): void {

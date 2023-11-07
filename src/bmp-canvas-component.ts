@@ -55,6 +55,8 @@ export class BPMApp extends LitElement {
       stateManager
     );
 
+    stateManager.bindToCanvas(this.canvasComponent);
+
     // Initialize canvasEventHandlers with a setter for the canvasComponent
     const canvasEventHandlers = new CanvasEventHandlers(
         this.canvasComponent,

@@ -13,8 +13,6 @@ export class CanvasComponent {
   public canvas: fabric.Canvas;
   public state: CanvasState;
   public stateManager: CanvasStateManager;
-  private undoStack: any[] = [];
-  private redoStack: any[] = [];
   private gridSize: number = 20;
 
   /**
@@ -25,13 +23,11 @@ export class CanvasComponent {
     this.canvas = new fabric.Canvas(canvasElement, {
       backgroundColor: "white",
       selection: true,
-      fireRightClick: true,  // <-- enable firing of right click events
+      fireRightClick: true, // <-- enable firing of right click events
       fireMiddleClick: true, // <-- enable firing of middle click events
       stopContextMenu: true, // <--  prevent context menu from showing
-      stateful: true
+      stateful: true,
     });
-
-    
 
     this.setCanvasSize();
     window.addEventListener("resize", this.setCanvasSize.bind(this));
@@ -64,9 +60,7 @@ export class CanvasComponent {
     });
 
     this.canvas.add(shape);
-    this.undoStack.push({ action: "addElement", element: shape });
-    this.redoStack = [];
-    this.handleStateUpdate("add", shape);
+
   }
 
   public setCanvasSize(): void {
@@ -141,48 +135,27 @@ export class CanvasComponent {
   }
 
   undo(): void {
-    this.handleAction("undo", this.undoStack, this.redoStack);
+    this.stateManager.undo();
+    this.canvas.renderAll();
   }
 
   redo(): void {
-    this.handleAction("redo", this.redoStack, this.undoStack);
-  }
-
-  // Helper method to handle undo/redo actions
-  private handleAction(
-    action: string,
-    sourceStack: any[],
-    targetStack: any[]
-  ): void {
-    const lastAction = sourceStack.pop();
-    if (lastAction) {
-      if (lastAction.action === "addElement") {
-        this.canvas[action === "undo" ? "remove" : "add"](lastAction.element);
-        this.setState({
-          elements:
-            action === "undo"
-              ? this.state.elements.filter((el) => el !== lastAction.element)
-              : [...this.state.elements, lastAction.element],
-        });
-      } else {
-        // Handle other actions
-        // Update this.state.otherFields accordingly
-      }
-      targetStack.push(lastAction);
-    }
-  }
-
-  // Helper method to update state
-  private setState(newState: Partial<CanvasState>) {
-    this.state = { ...this.state, ...newState };
+    this.stateManager.redo();
+    this.canvas.renderAll();
   }
 
   // Method to update CanvasState
-  private handleStateUpdate(actionType: string, element: fabric.Object): void {
+  private handleStateUpdate(
+    actionType: string,
+    element: fabric.Object,
+    from?: any,
+    to?: any
+  ): void {
     const action: CanvasAction = {
       type: actionType,
       object: element,
-      // Include 'from' and 'to' if necessary for the action type
+      from: from,
+      to: to,
     };
     this.stateManager.updateState(action);
   }
@@ -301,10 +274,19 @@ export class CanvasComponent {
   }
 
   // Method to move an element
-  public moveElement(element: fabric.Object, newPosition: { x: number; y: number }) {
+  public moveElement(
+    element: fabric.Object,
+    newPosition: { x: number; y: number }
+  ) {
+    const originalPosition = { left: element.left, top: element.top };
     element.set({ left: newPosition.x, top: newPosition.y });
     this.canvas.renderAll();
-    this.handleStateUpdate("move", element);
+    this.handleStateUpdate(
+      "moveElement",
+      element,
+      originalPosition,
+      newPosition
+    );
   }
 
   // Method to resize an element

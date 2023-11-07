@@ -23,40 +23,70 @@ export class CanvasStateManager {
   private state: CanvasState;
   private undoStack: CanvasAction[] = [];
   private redoStack: CanvasAction[] = [];
+  private canvas: fabric.Canvas; // Assuming we have a reference to the fabric canvas
 
-  constructor(initialState: CanvasState) {
+  constructor(initialState: CanvasState, canvas: fabric.Canvas) {
     this.state = initialState;
+    this.canvas = canvas;
+  }
+
+  public bindToCanvas(canvasComponent: fabric.Canvas) {
+    this.canvas = canvasComponent.canvas;
   }
 
   public updateState(action: CanvasAction): void {
-    // Implement the logic to update the state based on the action
-    // For example, handle 'move' action:
-    if (action.type === 'move') {
-      // Record the move action in the state
-      this.undoStack.push(action);
-      // Clear the redo stack whenever a new action is performed
-      this.redoStack = [];
-    }
-    // Handle other actions similarly
+    // Record the action in the state
+    this.undoStack.push(action);
+    // Clear the redo stack whenever a new action is performed
+    this.redoStack = [];
   }
 
   public undo(): void {
-    const action = this.undoStack.pop();
-    if (action) {
-      // Perform the undo operation
-      // You will need to implement the logic to reverse the action here
-      this.redoStack.push(action);
+    const lastAction = this.undoStack.pop();
+    if (lastAction) {
+      // Apply the reverse of the last action to the canvas
+      this.applyAction(lastAction, "undo");
+      // Push the action to the redo stack
+      this.redoStack.push(lastAction);
     }
   }
 
   public redo(): void {
-    const action = this.redoStack.pop();
-    if (action) {
-      // Perform the redo operation
-      // You will need to implement the logic to apply the action here
-      this.undoStack.push(action);
+    const lastAction = this.redoStack.pop();
+    if (lastAction) {
+      // Reapply the last undone action to the canvas
+      this.applyAction(lastAction, "redo");
+      // Push the action back to the undo stack
+      this.undoStack.push(lastAction);
     }
   }
 
-  // Other state management methods...
+  private applyAction(action: CanvasAction, method: "undo" | "redo"): void {
+    // Apply or reverse the move action
+    const position = method === "undo" ? action.from : action.to;
+
+    switch (action.type) {
+      case "move":
+        action.object.set(position);
+        break;
+
+      case "add":
+        if (method === "undo") {
+          this.canvas.remove(action.object);
+        } else {
+          this.canvas.add(action.object);
+        }
+        break;
+      case "remove":
+        if (method === "undo") {
+          this.canvas.add(action.object);
+        } else {
+          this.canvas.remove(action.object);
+        }
+        break;
+      // Handle other action types (add, remove, etc.)
+    }
+    // After applying the action, re-render the canvas
+    // this.canvas.renderAll();
+  }
 }
