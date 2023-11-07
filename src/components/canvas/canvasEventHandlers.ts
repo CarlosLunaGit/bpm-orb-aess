@@ -9,11 +9,12 @@ import { CanvasStateManager, CanvasAction } from '../../store/state';
 export class CanvasEventHandlers {
     public canvas: fabric.Canvas;
     private stateManager: CanvasStateManager;
-    private setCanvasComponent: (canvasComponent: any) => void; // Add a setter for the canvas component
+    public canvasComponent: fabric.Canvas; // Add a setter for the canvas component
 
     constructor(canvasComponent: fabric.Canvas, stateManager: CanvasStateManager) {
         this.canvas = canvasComponent.canvas;
         this.stateManager = stateManager;
+        this.canvasComponent = canvasComponent;
    
     }
 
@@ -23,29 +24,16 @@ export class CanvasEventHandlers {
   }
 
   private addCanvasEventListeners(): void {
+    //object:moving while an object is being dragged
     this.canvas.on("object:moving", (event) => {
-      // Handle object moving
-    });
-
-    // Updated event listeners for undo/redo
-    this.canvas.on("object:added", () => {
       //   this.saveState();
     });
 
-    this.canvas.on("object:removed", () => {
-      //   this.saveState();
+    //object:modified at the end of a transform or any change when statefull is true
+    this.canvas.on("object:modified", (event) => {
+       this.handleObjectMoved(event)
     });
 
-    this.canvas.on("object:modified", () => {
-      //   this.saveState();
-    });
-
-    // Add all canvas event listeners here
-    this.canvas.on("object:moved", this.handleObjectMoved.bind(this));
-    
-    this.canvas.on("object:selected", (event) => {
-
-      });
 
     // Context menu event listener
     this.canvas.on("mouse:down", (options) => {
@@ -67,7 +55,7 @@ export class CanvasEventHandlers {
       const action: CanvasAction = {
         type: 'move',
         object: object,
-        from: { left: object.originalState.left, top: object.originalState.top },
+        from: { left: object._stateProperties.left, top: object._stateProperties.top },
         to: { left: object.left, top: object.top },
       };
       this.stateManager.updateState(action);
@@ -110,11 +98,11 @@ export class CanvasEventHandlers {
       // Trigger the corresponding action
       const activeElement = this.canvas.getActiveObject();
       if (selectedAction === 'move') {
-        this.moveElement(activeElement, { x: 100, y: 100 });
+        this.canvasComponent.moveElement(activeElement, { x: 100, y: 100 });
       } else if (selectedAction === 'resize') {
-        this.resizeElement(activeElement, { width: 50, height: 50 });
+        this.canvasComponent.resizeElement(activeElement, { width: 50, height: 50 });
       } else if (selectedAction === 'delete') {
-        this.deleteElement(activeElement);
+        this.canvasComponent.deleteElement(activeElement);
       }
     });
 

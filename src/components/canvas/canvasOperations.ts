@@ -28,24 +28,24 @@ export class CanvasOperations {
    * Generic method to add a BPMN element to the canvas.
    * @param {string} elementType - The type of BPMN element to add.
    */
-  addElement(elementType: string): void {
+  addElement(event, elementType: string): void {
     let newElement;
 
     switch (elementType) {
       case "Task":
-        newElement = addTask();
+        newElement = addTask(event);
         break;
       case "Event":
-        newElement = addEvent();
+        newElement = addEvent(event);
         break;
       case "Gateway":
-        newElement = addGateway();
+        newElement = addGateway(event);
         break;
       case "DataObject":
-        newElement = addDataObject();
+        newElement = addDataObject(event);
         break;
       case "DataStore":
-        newElement = addDataStore();
+        newElement = addDataStore(event);
         break;
       default:
         console.error("Invalid element type");

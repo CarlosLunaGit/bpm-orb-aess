@@ -1,4 +1,5 @@
 import { fabric } from "fabric";
+import  calculateCoordinates  from "../../utils/calculateCoordinates";
 
 fabric.DataObject = fabric.util.createClass(fabric.Rect, {
     type: "dataObject",
@@ -42,19 +43,19 @@ fabric.DataObject = fabric.util.createClass(fabric.Rect, {
     },
   });
 
-  export function addDataObject() {
+  export function addDataObject(event) {
     const dataObject = new fabric.DataObject({
-      left: 100,
-      top: 100,
+        left: event.clientX,
+        top: event.clientY,
     });
   
     return dataObject;
   }
   
-  export function addDataStore() {
+  export function addDataStore(event) {
       const dataStore = new fabric.DataStore({
-          left: 300,
-          top: 300,
+        left: event.clientX,
+        top: event.clientY,
           fill: "white",
           stroke: "black",
           radius: 40,

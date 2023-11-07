@@ -1,4 +1,5 @@
 import { fabric } from "fabric";
+import  calculateCoordinates  from "../../utils/calculateCoordinates";
 
 fabric.Task = fabric.util.createClass(fabric.Rect, {
   type: "Task",
@@ -59,10 +60,11 @@ fabric.Gateway = fabric.util.createClass(fabric.Path, {
 
 
 // Export methods to add these elements
-export function addTask() {
+export function addTask(event) {
+  const { x, y } = calculateCoordinates(event.clientX, event.clientY)
   const newTask = new fabric.Task({
-    left: 100,
-    top: 100,
+    left: x,
+    top: y,
     fill: "white",
     stroke: "black",
     width: 120,
@@ -76,10 +78,12 @@ export function addTask() {
 
 }
 
-export function addEvent() {
+export function addEvent(event) {
+    const { x, y } = calculateCoordinates(event.clientX, event.clientY)
+
   const newEvent = new fabric.Event({
-    left: 250,
-    top: 250,
+    left: x,
+    top: y,
     fill: "white",
     stroke: "black",
     radius: 30,
@@ -90,10 +94,12 @@ export function addEvent() {
   return newEvent;
 }
 
-export function addGateway() {
-  const newGateway = new fabric.Gateway("M 0 30 L 30 60 L 60 30 L 30 0 z", {
-    left: 400,
-    top: 400,
+export function addGateway(event) {
+    const { x, y } = calculateCoordinates(event.clientX, event.clientY)
+
+    const newGateway = new fabric.Gateway("M 0 30 L 30 60 L 60 30 L 30 0 z", {
+    left: x,
+    top: y,
     fill: "white",
     stroke: "black",
     type: "Gateway",

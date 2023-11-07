@@ -28,6 +28,7 @@ export class CanvasComponent {
       fireRightClick: true,  // <-- enable firing of right click events
       fireMiddleClick: true, // <-- enable firing of middle click events
       stopContextMenu: true, // <--  prevent context menu from showing
+      stateful: true
     });
 
     
@@ -300,14 +301,14 @@ export class CanvasComponent {
   }
 
   // Method to move an element
-  moveElement(element: fabric.Object, newPosition: { x: number; y: number }) {
+  public moveElement(element: fabric.Object, newPosition: { x: number; y: number }) {
     element.set({ left: newPosition.x, top: newPosition.y });
     this.canvas.renderAll();
     this.handleStateUpdate("move", element);
   }
 
   // Method to resize an element
-  resizeElement(
+  public resizeElement(
     element: fabric.Object,
     newSize: { width: number; height: number }
   ) {
@@ -317,7 +318,7 @@ export class CanvasComponent {
   }
 
   // Method to delete an element
-  deleteElement(element: fabric.Object) {
+  public deleteElement(element: fabric.Object) {
     this.canvas.remove(element);
     this.handleStateUpdate("delete", element);
   }

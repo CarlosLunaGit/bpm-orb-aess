@@ -11,16 +11,16 @@ export class SidebarComponent {
         this.canvasOperations = canvasOperations;
 
         // Now that we have canvasOperations, we can bind the drag and drop events
-        this.shadowRoot?.querySelector('#task')?.addEventListener('dragend', () => {
-            this.canvasOperations.addElement('Task');
+        this.shadowRoot?.querySelector('#task')?.addEventListener('dragend', (event) => {
+            this.canvasOperations.addElement(event,'Task');
         });
 
-        this.shadowRoot?.querySelector('#event')?.addEventListener('dragend', () => {
-            this.canvasOperations.addElement('Event');
+        this.shadowRoot?.querySelector('#event')?.addEventListener('dragend', (event) => {
+            this.canvasOperations.addElement(event,'Event');
         });
 
-        this.shadowRoot?.querySelector('#gateway')?.addEventListener('dragend', () => {
-            this.canvasOperations.addElement('Gateway');
+        this.shadowRoot?.querySelector('#gateway')?.addEventListener('dragend', (event) => {
+            this.canvasOperations.addElement(event,'Gateway');
         });
 
         // Bind the undo and redo actions to the respective icons
