@@ -14,6 +14,7 @@ export class CanvasComponent {
   public state: CanvasState;
   public stateManager: CanvasStateManager;
   private gridSize: number = 20;
+  public isPanning: boolean = false;
 
   /**
    * Initializes a new instance of the CanvasComponent class.
@@ -219,25 +220,40 @@ export class CanvasComponent {
     });
   }
 
-  /**
-   * Zooms in the canvas.
+/**
+   * Toggles the panning mode on the canvas.
    */
-  zoomIn(): void {
-    let zoom = this.canvas.getZoom();
-    zoom = zoom + 0.1;
-    this.canvas.setZoom(zoom);
-  }
+togglePanning(): void {
+  this.isPanning = !this.isPanning;
+  this.canvas.selection = !this.isPanning; // Disable selection when panning
+  this.canvas.defaultCursor = this.isPanning ? 'grab' : 'default';
+}
 
-  /**
-   * Zooms out the canvas.
-   */
-  zoomOut(): void {
-    let zoom = this.canvas.getZoom();
-    if (zoom > 0.1) {
-      zoom = zoom - 0.1;
-      this.canvas.setZoom(zoom);
-    }
+/**
+ * Zooms in the canvas.
+ */
+zoomIn(): void {
+  let zoom = this.canvas.getZoom();
+  zoom = zoom + 0.1;
+  if (zoom > 2) zoom = 2; // Set max zoom level
+  this.canvas.setZoom(zoom);
+  // Update state with new zoom level
+  // ... state update logic ...
+}
+
+/**
+ * Zooms out the canvas.
+ */
+zoomOut(): void {
+  let zoom = this.canvas.getZoom();
+  if (zoom > 0.1) {
+    zoom = zoom - 0.1;
+    this.canvas.setZoom(zoom);
+    // Update state with new zoom level
+    // ... state update logic ...
   }
+}
+
 
   /**
    * Updates the element on the canvas.

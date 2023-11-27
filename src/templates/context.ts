@@ -9,6 +9,9 @@ import {
   faCodeBranch,
   faDownload,
   faUpload,
+  faMagnifyingGlassPlus,
+  faMagnifyingGlassMinus,
+  faHand,
 } from "@fortawesome/free-solid-svg-icons";
 import { library, dom, icon } from "@fortawesome/fontawesome-svg-core";
 
@@ -23,4 +26,7 @@ export const context = {
   taskIcon: icon(faRectangleList).html,
   eventIcon: icon(faDotCircle).html,
   gatewayIcon: icon(faDiamond).html,
+  zoomInIcon: icon(faMagnifyingGlassPlus).html,
+  zoomOutIcon: icon(faMagnifyingGlassMinus).html,
+  togglePanIcon: icon(faHand).html,
 };

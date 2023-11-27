@@ -30,17 +30,34 @@ export class PropertiesPanelComponent {
    */
   private generateFormContent(elementType: string): string {
     return `
-        <div class="form-floating">
+    Editor
+        <div class="form-floating editor-item">
+          <textarea
+            name="bpmnType"
+            class="form-control"
+            id="bpmnType"
+          ></textarea>
+          <label class="__label" for="bpmnType">BPMN Type</label>
+        </div>
+        <div class="form-floating editor-item">
             <input type="text" name="name" value="${
               this.selectedElement.name || ""
             }" class="form-control" id="inputName">
             <label class="__label" for="inputName">Name</label>
         </div>
-        <div class="form-floating">
+        <div class="form-floating editor-item">
             <textarea name="description" class="form-control" id="inputDescription">${
               this.selectedElement.description || ""
             }</textarea>
             <label class="__label" for="inputDescription">Description</label>
+        </div>
+        <div class="form-floating editor-item">
+          <textarea
+            name="Integration"
+            class="form-control"
+            id="inputIntegration"
+          ></textarea>
+          <label class="__label" for="inputIntegration">Integration</label>
         </div>
     `;
   }
@@ -54,6 +71,7 @@ export class PropertiesPanelComponent {
     let formContent = this.generateFormContent(this.selectedElement.type);
     formContent += '<button type="submit">Update</button>';
     this.propertiesForm.innerHTML = formContent;
+
   }
 
   /**

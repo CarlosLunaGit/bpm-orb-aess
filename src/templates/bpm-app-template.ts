@@ -69,6 +69,9 @@ export const bpmAppTemplate = (data) => html`
   <div id="redoIconId" .innerHTML=${context.redoIcon} title="Redo"></div>
   <div id="saveIconId" .innerHTML=${context.saveIcon} title="Save/Download"></div>
   <div id="loadIconId" .innerHTML=${context.loadIcon} title="Load/Open"></div>
+  <div id="zoomInIconId" .innerHTML=${context.zoomInIcon} title="Zoom In"></div>
+  <div id="zoomOutIconId" .innerHTML=${context.zoomOutIcon} title="Zoom Out"></div>
+  <div id="togglePanIconId" .innerHTML=${context.togglePanIcon} title="Toggle Pan"></div>
   <!-- Add other icons for different actions here -->
 </div>
 

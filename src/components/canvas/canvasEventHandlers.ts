@@ -10,6 +10,9 @@ export class CanvasEventHandlers {
   public canvas: fabric.Canvas;
   private stateManager: CanvasStateManager;
   public canvasComponent: fabric.Canvas; // Add a setter for the canvas component
+  
+  private lastPosX: number;
+  private lastPosY: number;
 
   constructor(
     canvasComponent: fabric.Canvas,
@@ -59,6 +62,32 @@ export class CanvasEventHandlers {
         this.handleContextMenu(options.e.clientX, options.e.clientY);
       }
     });
+
+     // Add panning event listeners
+     this.canvas.on('mouse:down', (opt) => {
+      if (this.canvasComponent.isPanning && opt.e) {
+        this.canvas.isDragging = true;
+        this.lastPosX = opt.e.clientX;
+        this.lastPosY = opt.e.clientY;
+      }
+    });
+
+    this.canvas.on('mouse:move', (opt) => {
+      if (this.canvas.isDragging && opt.e) {
+        const e = opt.e;
+        const vpt = this.canvas.viewportTransform;
+        vpt[4] += e.clientX - this.lastPosX;
+        vpt[5] += e.clientY - this.lastPosY;
+        this.canvas.requestRenderAll();
+        this.lastPosX = e.clientX;
+        this.lastPosY = e.clientY;
+      }
+    });
+
+    this.canvas.on('mouse:up', () => {
+      this.canvas.isDragging = false;
+    });
+
   }
 
   private handleObjectAdded(event: fabric.IEvent): void {

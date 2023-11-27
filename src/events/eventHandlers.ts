@@ -13,10 +13,10 @@ export class EventHandlers {
   }
   
   attachEventHandlers() {
-    const undoIconEl = this.shadowRoot?.querySelector('#undoIconId');
-    const redoIconEl = this.shadowRoot?.querySelector('#redoIconId');
-    undoIconEl?.addEventListener('click', () => this.canvasComponent?.undo());
-    redoIconEl?.addEventListener('click', () => this.canvasComponent?.redo());
+   
+    // const redoIconEl = this.shadowRoot?.querySelector('#redoIconId');
+ 
+    // redoIconEl?.addEventListener('click', () => this.canvasComponent?.redo());
 
     const saveIconEl = this.shadowRoot?.querySelector('#saveIconId');
     const loadIconEl = this.shadowRoot?.querySelector('#loadIconId');
